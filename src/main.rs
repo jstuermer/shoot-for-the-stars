@@ -1,18 +1,24 @@
 use bevy::{prelude::*, window::PrimaryWindow};
+use rand::Rng;
 
 pub const PLAYER_SIZE: f32 = 64.0; // this is the size of the player sprite
+pub const ENEMY_SIZE: f32 = 64.0; // this is the size of the enemy sprite
 pub const PLAYER_SPEED: f32 = 500.0;
+pub const NUMBER_OF_ENEMIES: usize = 4;
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_systems(Startup, (spawn_camera, spawn_player))
+        .add_systems(Startup, (spawn_camera, spawn_player, spawn_enemies))
         .add_systems(Update, (player_movement, confine_player_movement))
         .run();
 }
 
 #[derive(Component)]
 pub struct Player {}
+
+#[derive(Component)]
+pub struct Enemy {}
 
 pub fn spawn_player(
     mut commands: Commands,
@@ -29,6 +35,34 @@ pub fn spawn_player(
         },
         Player {},
     ));
+}
+
+pub fn spawn_enemies(
+    mut commands: Commands,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+    asset_server: Res<AssetServer>,
+) {
+    let window: &Window = window_query.get_single().unwrap();
+
+    let half_enemy_size: f32 = ENEMY_SIZE / 2.0;
+    let x_min: f32 = half_enemy_size;
+    let x_max: f32 = window.width() - half_enemy_size;
+    let y_min: f32 = half_enemy_size;
+    let y_max: f32 = window.height() - half_enemy_size;
+
+    for _ in 0..NUMBER_OF_ENEMIES {
+        let x_position: f32 = rand::thread_rng().gen_range(x_min..=x_max);
+        let y_position: f32 = rand::thread_rng().gen_range(y_min..=y_max);
+
+        commands.spawn((
+            SpriteBundle {
+                transform: Transform::from_xyz(x_position, y_position, 0.0),
+                texture: asset_server.load("sprites/ball_red_large.png"),
+                ..default()
+            },
+            Enemy {},
+        ));
+    }
 }
 
 pub fn spawn_camera(mut commands: Commands, window_query: Query<&Window, With<PrimaryWindow>>) {
