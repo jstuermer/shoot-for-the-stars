@@ -1,16 +1,21 @@
 use bevy::{prelude::*, window::PrimaryWindow};
-use rand::Rng;
+use rand::{seq::SliceRandom, Rng};
 
 pub const PLAYER_SIZE: f32 = 64.0; // this is the size of the player sprite
 pub const ENEMY_SIZE: f32 = 64.0; // this is the size of the enemy sprite
 pub const PLAYER_SPEED: f32 = 500.0;
+pub const ENEMY_SPEED: f32 = 200.0;
 pub const NUMBER_OF_ENEMIES: usize = 4;
+pub const ENEMY_TIMESTEP: f32 = 1.0;
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_systems(Startup, (spawn_camera, spawn_player, spawn_enemies))
         .add_systems(Update, (player_movement, confine_player_movement))
+        .add_systems(FixedUpdate, enemy_redirection)
+        .insert_resource(FixedTime::new_from_secs(ENEMY_TIMESTEP))
+        .add_systems(Update, (enemy_movement, confine_enemy_movement))
         .run();
 }
 
@@ -18,7 +23,9 @@ fn main() {
 pub struct Player {}
 
 #[derive(Component)]
-pub struct Enemy {}
+pub struct Enemy {
+    direction: Vec3,
+}
 
 pub fn spawn_player(
     mut commands: Commands,
@@ -49,10 +56,11 @@ pub fn spawn_enemies(
     let x_max: f32 = window.width() - half_enemy_size;
     let y_min: f32 = half_enemy_size;
     let y_max: f32 = window.height() - half_enemy_size;
+    let mut rng: rand::rngs::ThreadRng = rand::thread_rng();
 
     for _ in 0..NUMBER_OF_ENEMIES {
-        let x_position: f32 = rand::thread_rng().gen_range(x_min..=x_max);
-        let y_position: f32 = rand::thread_rng().gen_range(y_min..=y_max);
+        let x_position: f32 = rng.gen_range(x_min..=x_max);
+        let y_position: f32 = rng.gen_range(y_min..=y_max);
 
         commands.spawn((
             SpriteBundle {
@@ -60,7 +68,9 @@ pub fn spawn_enemies(
                 texture: asset_server.load("sprites/ball_red_large.png"),
                 ..default()
             },
-            Enemy {},
+            Enemy {
+                direction: Vec3::ZERO,
+            },
         ));
     }
 }
@@ -72,6 +82,61 @@ pub fn spawn_camera(mut commands: Commands, window_query: Query<&Window, With<Pr
         transform: Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 0.0),
         ..default()
     });
+}
+
+pub fn enemy_redirection(mut enemy_query: Query<&mut Enemy>) {
+    let sample_directions: [f32; 3] = [-1.0, 0.0, 1.0];
+    let mut rng: rand::rngs::ThreadRng = rand::thread_rng();
+
+    for mut enemy in &mut enemy_query {
+        let mut direction = Vec3::ZERO;
+        let x_random: &f32 = sample_directions
+            .choose(&mut rng)
+            .expect("Random x direction should have been generated.");
+        let y_random: &f32 = sample_directions
+            .choose(&mut rng)
+            .expect("Random y direction should have been generated.");
+        direction += Vec3::new(*x_random, *y_random, 0.0);
+        enemy.direction = direction.normalize_or_zero();
+    }
+}
+
+pub fn enemy_movement(mut enemy_query: Query<(&mut Transform, &Enemy)>, time: Res<Time>) {
+    for (mut enemy_transform, enemy) in &mut enemy_query {
+        enemy_transform.translation += enemy.direction * ENEMY_SPEED * time.delta_seconds();
+    }
+}
+
+pub fn confine_enemy_movement(
+    mut enemy_query: Query<(&mut Transform, &mut Enemy)>,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+) {
+    let window: &Window = window_query.get_single().unwrap();
+    let half_enemy_size: f32 = ENEMY_SIZE / 2.0;
+
+    let x_min: f32 = half_enemy_size;
+    let x_max: f32 = window.width() - half_enemy_size;
+    let y_min: f32 = half_enemy_size;
+    let y_max: f32 = window.height() - half_enemy_size;
+
+    for (mut enemy_transform, mut enemy) in &mut enemy_query {
+        if enemy_transform.translation.x < x_min {
+            enemy_transform.translation.x = x_min;
+            enemy.direction.x = -enemy.direction.x;
+        }
+        if enemy_transform.translation.x > x_max {
+            enemy_transform.translation.x = x_max;
+            enemy.direction.x = -enemy.direction.x;
+        }
+        if enemy_transform.translation.y < y_min {
+            enemy_transform.translation.y = y_min;
+            enemy.direction.y = -enemy.direction.y;
+        }
+        if enemy_transform.translation.y > y_max {
+            enemy_transform.translation.y = y_max;
+            enemy.direction.y = -enemy.direction.y;
+        }
+    }
 }
 
 pub fn player_movement(
