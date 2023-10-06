@@ -12,10 +12,20 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_systems(Startup, (spawn_camera, spawn_player, spawn_enemies))
-        .add_systems(Update, (player_movement, confine_player_movement))
-        .add_systems(FixedUpdate, enemy_redirection)
+        .add_systems(
+            Update,
+            (
+                player_movement,
+                confine_player_movement.after(player_movement),
+                enemy_movement,
+                confine_enemy_movement.after(enemy_movement),
+            ),
+        )
+        .add_systems(
+            FixedUpdate,
+            enemy_redirection.before(confine_enemy_movement),
+        )
         .insert_resource(FixedTime::new_from_secs(ENEMY_TIMESTEP))
-        .add_systems(Update, (enemy_movement, confine_enemy_movement))
         .run();
 }
 
@@ -108,8 +118,10 @@ pub fn enemy_movement(mut enemy_query: Query<(&mut Transform, &Enemy)>, time: Re
 }
 
 pub fn confine_enemy_movement(
+    mut commands: Commands,
     mut enemy_query: Query<(&mut Transform, &mut Enemy)>,
     window_query: Query<&Window, With<PrimaryWindow>>,
+    asset_server: Res<AssetServer>,
 ) {
     let window: &Window = window_query.get_single().unwrap();
     let half_enemy_size: f32 = ENEMY_SIZE / 2.0;
@@ -120,21 +132,32 @@ pub fn confine_enemy_movement(
     let y_max: f32 = window.height() - half_enemy_size;
 
     for (mut enemy_transform, mut enemy) in &mut enemy_query {
+        let mut changed_direction: bool = false;
+
         if enemy_transform.translation.x < x_min {
             enemy_transform.translation.x = x_min;
             enemy.direction.x = -enemy.direction.x;
-        }
-        if enemy_transform.translation.x > x_max {
+            changed_direction = true;
+        } else if enemy_transform.translation.x > x_max {
             enemy_transform.translation.x = x_max;
             enemy.direction.x = -enemy.direction.x;
+            changed_direction = true;
         }
         if enemy_transform.translation.y < y_min {
             enemy_transform.translation.y = y_min;
             enemy.direction.y = -enemy.direction.y;
-        }
-        if enemy_transform.translation.y > y_max {
+            changed_direction = true;
+        } else if enemy_transform.translation.y > y_max {
             enemy_transform.translation.y = y_max;
             enemy.direction.y = -enemy.direction.y;
+            changed_direction = true;
+        }
+
+        if changed_direction {
+            commands.spawn(AudioBundle {
+                source: asset_server.load("audio/pluck_001.ogg"),
+                settings: PlaybackSettings::DESPAWN,
+            });
         }
     }
 }
