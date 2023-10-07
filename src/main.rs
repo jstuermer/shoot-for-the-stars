@@ -7,6 +7,7 @@ pub const PLAYER_SPEED: f32 = 500.0;
 pub const ENEMY_SPEED: f32 = 200.0;
 pub const NUMBER_OF_ENEMIES: usize = 4;
 pub const ENEMY_TIMESTEP: f32 = 1.0;
+pub const COLLISION_REBOUND_STRENGTH: f32 = 50.0;
 
 fn main() {
     App::new()
@@ -19,6 +20,7 @@ fn main() {
                 confine_player_movement.after(player_movement),
                 enemy_movement,
                 confine_enemy_movement.after(enemy_movement),
+                enemy_hit_player,
             ),
         )
         .add_systems(
@@ -46,7 +48,7 @@ pub fn spawn_player(
 
     commands.spawn((
         SpriteBundle {
-            transform: Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 10.0),
+            transform: Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 0.0),
             texture: asset_server.load("sprites/ball_blue_large.png"),
             ..default()
         },
@@ -213,6 +215,37 @@ pub fn confine_player_movement(
         }
         if player_transform.translation.y > y_max {
             player_transform.translation.y = y_max;
+        }
+    }
+}
+
+pub fn enemy_hit_player(
+    mut commands: Commands,
+    mut player_query: Query<(Entity, &mut Transform), (With<Player>, Without<Enemy>)>,
+    mut enemy_query: Query<&mut Transform, (With<Enemy>, Without<Player>)>,
+    asset_server: Res<AssetServer>,
+) {
+    if let Ok((_player_entity, mut player_transform)) = player_query.get_single_mut() {
+        let collision_distance = (PLAYER_SIZE + ENEMY_SIZE) / 2.0;
+        for mut enemy_transform in &mut enemy_query {
+            let distance = player_transform
+                .translation
+                .distance(enemy_transform.translation);
+
+            if distance > collision_distance {
+                continue;
+            }
+
+            commands.spawn(AudioBundle {
+                source: asset_server.load("audio/explosionCrunch_000.ogg"),
+                settings: PlaybackSettings::DESPAWN,
+            });
+
+            let mut relative_vector = player_transform.translation - enemy_transform.translation;
+            relative_vector.z = 0.0; // z-ordering must be neglected
+            relative_vector = relative_vector.normalize_or_zero();
+            enemy_transform.translation -= COLLISION_REBOUND_STRENGTH * relative_vector;
+            player_transform.translation += COLLISION_REBOUND_STRENGTH * relative_vector;
         }
     }
 }
