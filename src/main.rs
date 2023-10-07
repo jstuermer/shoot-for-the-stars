@@ -228,11 +228,13 @@ pub fn enemy_hit_player(
     if let Ok((_player_entity, mut player_transform)) = player_query.get_single_mut() {
         let collision_distance = (PLAYER_SIZE + ENEMY_SIZE) / 2.0;
         for mut enemy_transform in &mut enemy_query {
-            let distance = player_transform
-                .translation
-                .distance(enemy_transform.translation);
+            let mut relative_vector_in_plane = Vec3 {
+                x: player_transform.translation.x - enemy_transform.translation.x,
+                y: player_transform.translation.y - enemy_transform.translation.y,
+                z: 0.0,
+            };
 
-            if distance > collision_distance {
+            if relative_vector_in_plane.length() > collision_distance {
                 continue;
             }
 
@@ -241,11 +243,9 @@ pub fn enemy_hit_player(
                 settings: PlaybackSettings::DESPAWN,
             });
 
-            let mut relative_vector = player_transform.translation - enemy_transform.translation;
-            relative_vector.z = 0.0; // z-ordering must be neglected
-            relative_vector = relative_vector.normalize_or_zero();
-            enemy_transform.translation -= COLLISION_REBOUND_STRENGTH * relative_vector;
-            player_transform.translation += COLLISION_REBOUND_STRENGTH * relative_vector;
+            relative_vector_in_plane = relative_vector_in_plane.normalize_or_zero();
+            enemy_transform.translation -= COLLISION_REBOUND_STRENGTH * relative_vector_in_plane;
+            player_transform.translation += COLLISION_REBOUND_STRENGTH * relative_vector_in_plane;
         }
     }
 }
