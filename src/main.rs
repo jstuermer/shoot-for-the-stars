@@ -1,18 +1,25 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 use rand::{seq::SliceRandom, Rng};
 
+mod utils;
+
 pub const PLAYER_SIZE: f32 = 64.0; // this is the size of the player sprite
 pub const ENEMY_SIZE: f32 = 64.0; // this is the size of the enemy sprite
+pub const STAR_SIZE: f32 = 30.0; // this is the size of the star sprite
 pub const PLAYER_SPEED: f32 = 500.0;
 pub const ENEMY_SPEED: f32 = 200.0;
 pub const NUMBER_OF_ENEMIES: usize = 4;
 pub const ENEMY_TIMESTEP: f32 = 1.0;
 pub const COLLISION_REBOUND_STRENGTH: f32 = 50.0;
+pub const NUMBER_OF_STARS: usize = 10;
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_systems(Startup, (spawn_camera, spawn_player, spawn_enemies))
+        .add_systems(
+            Startup,
+            (spawn_camera, spawn_player, spawn_enemies, spawn_stars),
+        )
         .add_systems(
             Update,
             (
@@ -39,6 +46,9 @@ pub struct Enemy {
     direction: Vec3,
 }
 
+#[derive(Component)]
+pub struct Star {}
+
 pub fn spawn_player(
     mut commands: Commands,
     window_query: Query<&Window, With<PrimaryWindow>>,
@@ -62,12 +72,7 @@ pub fn spawn_enemies(
     asset_server: Res<AssetServer>,
 ) {
     let window: &Window = window_query.get_single().unwrap();
-
-    let half_enemy_size: f32 = ENEMY_SIZE / 2.0;
-    let x_min: f32 = half_enemy_size;
-    let x_max: f32 = window.width() - half_enemy_size;
-    let y_min: f32 = half_enemy_size;
-    let y_max: f32 = window.height() - half_enemy_size;
+    let [x_min, x_max, y_min, y_max] = utils::get_confinement(window, ENEMY_SIZE);
     let mut rng: rand::rngs::ThreadRng = rand::thread_rng();
 
     for _ in 0..NUMBER_OF_ENEMIES {
@@ -83,6 +88,30 @@ pub fn spawn_enemies(
             Enemy {
                 direction: Vec3::ZERO,
             },
+        ));
+    }
+}
+
+pub fn spawn_stars(
+    mut commands: Commands,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+    asset_server: Res<AssetServer>,
+) {
+    let window: &Window = window_query.get_single().unwrap();
+    let [x_min, x_max, y_min, y_max] = utils::get_confinement(window, STAR_SIZE);
+    let mut rng: rand::rngs::ThreadRng = rand::thread_rng();
+
+    for _ in 0..NUMBER_OF_STARS {
+        let x_position: f32 = rng.gen_range(x_min..=x_max);
+        let y_position: f32 = rng.gen_range(y_min..=y_max);
+
+        commands.spawn((
+            SpriteBundle {
+                transform: Transform::from_xyz(x_position, y_position, 0.0),
+                texture: asset_server.load("sprites/star.png"),
+                ..default()
+            },
+            Star {},
         ));
     }
 }
@@ -126,12 +155,7 @@ pub fn confine_enemy_movement(
     asset_server: Res<AssetServer>,
 ) {
     let window: &Window = window_query.get_single().unwrap();
-    let half_enemy_size: f32 = ENEMY_SIZE / 2.0;
-
-    let x_min: f32 = half_enemy_size;
-    let x_max: f32 = window.width() - half_enemy_size;
-    let y_min: f32 = half_enemy_size;
-    let y_max: f32 = window.height() - half_enemy_size;
+    let [x_min, x_max, y_min, y_max] = utils::get_confinement(window, ENEMY_SIZE);
 
     for (mut enemy_transform, mut enemy) in &mut enemy_query {
         let mut changed_direction: bool = false;
@@ -197,23 +221,16 @@ pub fn confine_player_movement(
 ) {
     if let Ok(mut player_transform) = player_query.get_single_mut() {
         let window: &Window = window_query.get_single().unwrap();
-        let half_player_size: f32 = PLAYER_SIZE / 2.0;
-
-        let x_min: f32 = half_player_size;
-        let x_max: f32 = window.width() - half_player_size;
-        let y_min: f32 = half_player_size;
-        let y_max: f32 = window.height() - half_player_size;
+        let [x_min, x_max, y_min, y_max] = utils::get_confinement(window, PLAYER_SIZE);
 
         if player_transform.translation.x < x_min {
             player_transform.translation.x = x_min;
-        }
-        if player_transform.translation.x > x_max {
+        } else if player_transform.translation.x > x_max {
             player_transform.translation.x = x_max;
         }
         if player_transform.translation.y < y_min {
             player_transform.translation.y = y_min;
-        }
-        if player_transform.translation.y > y_max {
+        } else if player_transform.translation.y > y_max {
             player_transform.translation.y = y_max;
         }
     }
