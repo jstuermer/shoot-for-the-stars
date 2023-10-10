@@ -27,7 +27,8 @@ fn main() {
                 confine_player_movement.after(player_movement),
                 enemy_movement,
                 confine_enemy_movement.after(enemy_movement),
-                enemy_hit_player,
+                player_hit_enemy,
+                player_hit_star,
             ),
         )
         .add_systems(
@@ -236,13 +237,13 @@ pub fn confine_player_movement(
     }
 }
 
-pub fn enemy_hit_player(
+pub fn player_hit_enemy(
     mut commands: Commands,
-    mut player_query: Query<(Entity, &mut Transform), (With<Player>, Without<Enemy>)>,
-    mut enemy_query: Query<&mut Transform, (With<Enemy>, Without<Player>)>,
+    mut player_query: Query<&mut Transform, (With<Player>, Without<Enemy>)>,
+    mut enemy_query: Query<&mut Transform, With<Enemy>>,
     asset_server: Res<AssetServer>,
 ) {
-    if let Ok((_player_entity, mut player_transform)) = player_query.get_single_mut() {
+    if let Ok(mut player_transform) = player_query.get_single_mut() {
         let collision_distance = (PLAYER_SIZE + ENEMY_SIZE) / 2.0;
         for mut enemy_transform in &mut enemy_query {
             let mut relative_vector_in_plane = Vec3 {
@@ -263,6 +264,35 @@ pub fn enemy_hit_player(
             relative_vector_in_plane = relative_vector_in_plane.normalize_or_zero();
             enemy_transform.translation -= COLLISION_REBOUND_STRENGTH * relative_vector_in_plane;
             player_transform.translation += COLLISION_REBOUND_STRENGTH * relative_vector_in_plane;
+        }
+    }
+}
+
+pub fn player_hit_star(
+    mut commands: Commands,
+    player_query: Query<&mut Transform, (With<Player>, Without<Star>)>,
+    star_query: Query<(Entity, &mut Transform), With<Star>>,
+    asset_server: Res<AssetServer>,
+) {
+    if let Ok(player_transform) = player_query.get_single() {
+        let collision_distance = (PLAYER_SIZE + ENEMY_SIZE) / 2.0;
+        for (star_entity, star_transform) in &star_query {
+            let relative_vector_in_plane = Vec3 {
+                x: player_transform.translation.x - star_transform.translation.x,
+                y: player_transform.translation.y - star_transform.translation.y,
+                z: 0.0,
+            };
+
+            if relative_vector_in_plane.length() > collision_distance {
+                continue;
+            }
+
+            commands.spawn(AudioBundle {
+                source: asset_server.load("audio/laserLarge_000.ogg"),
+                settings: PlaybackSettings::DESPAWN,
+            });
+
+            commands.entity(star_entity).despawn();
         }
     }
 }
