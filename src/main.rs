@@ -12,11 +12,13 @@ pub const NUMBER_OF_ENEMIES: usize = 4;
 pub const ENEMY_TIMESTEP: f32 = 1.0;
 pub const COLLISION_REBOUND_STRENGTH: f32 = 50.0;
 pub const NUMBER_OF_STARS: usize = 10;
+pub const STAR_SPAWN_TIME: f32 = 1.0;
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .init_resource::<Score>()
+        .init_resource::<StarSpawnTimer>()
         .add_systems(
             Startup,
             (spawn_camera, spawn_player, spawn_enemies, spawn_stars),
@@ -31,6 +33,8 @@ fn main() {
                 player_hit_enemy,
                 player_hit_star,
                 update_score,
+                tick_star_spawn_timer,
+                spawn_stars_over_time,
             ),
         )
         .add_systems(
@@ -53,14 +57,21 @@ pub struct Enemy {
 pub struct Star {}
 
 #[derive(Resource)]
-pub struct Score {
-    pub value: u32,
+pub struct StarSpawnTimer {
+    pub timer: Timer,
 }
 
-impl Default for Score {
-    fn default() -> Score {
-        Score { value: 0 }
+impl Default for StarSpawnTimer {
+    fn default() -> StarSpawnTimer {
+        StarSpawnTimer {
+            timer: Timer::from_seconds(STAR_SPAWN_TIME, TimerMode::Repeating),
+        }
     }
+}
+
+#[derive(Resource, Default)]
+pub struct Score {
+    pub value: u32,
 }
 
 pub fn spawn_player(
@@ -316,4 +327,35 @@ pub fn update_score(score: Res<Score>) {
     if score.is_changed() {
         println!("Score: {}", score.value.to_string())
     }
+}
+
+pub fn tick_star_spawn_timer(mut star_spawn_timer: ResMut<StarSpawnTimer>, time: Res<Time>) {
+    star_spawn_timer.timer.tick(time.delta());
+}
+
+pub fn spawn_stars_over_time(
+    mut commands: Commands,
+    star_spawn_timer: ResMut<StarSpawnTimer>,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+    asset_server: Res<AssetServer>,
+) {
+    if !star_spawn_timer.timer.finished() {
+        return;
+    }
+
+    let window: &Window = window_query.get_single().unwrap();
+    let [x_min, x_max, y_min, y_max] = utils::get_confinement(window, STAR_SIZE);
+    let mut rng: rand::rngs::ThreadRng = rand::thread_rng();
+
+    let x_position: f32 = rng.gen_range(x_min..=x_max);
+    let y_position: f32 = rng.gen_range(y_min..=y_max);
+
+    commands.spawn((
+        SpriteBundle {
+            transform: Transform::from_xyz(x_position, y_position, 0.0),
+            texture: asset_server.load("sprites/star.png"),
+            ..default()
+        },
+        Star {},
+    ));
 }
