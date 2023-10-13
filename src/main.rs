@@ -16,6 +16,7 @@ pub const NUMBER_OF_STARS: usize = 10;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        .init_resource::<Score>()
         .add_systems(
             Startup,
             (spawn_camera, spawn_player, spawn_enemies, spawn_stars),
@@ -29,6 +30,7 @@ fn main() {
                 confine_enemy_movement.after(enemy_movement),
                 player_hit_enemy,
                 player_hit_star,
+                update_score,
             ),
         )
         .add_systems(
@@ -49,6 +51,17 @@ pub struct Enemy {
 
 #[derive(Component)]
 pub struct Star {}
+
+#[derive(Resource)]
+pub struct Score {
+    pub value: u32,
+}
+
+impl Default for Score {
+    fn default() -> Score {
+        Score { value: 0 }
+    }
+}
 
 pub fn spawn_player(
     mut commands: Commands,
@@ -273,6 +286,7 @@ pub fn player_hit_star(
     player_query: Query<&mut Transform, (With<Player>, Without<Star>)>,
     star_query: Query<(Entity, &mut Transform), With<Star>>,
     asset_server: Res<AssetServer>,
+    mut score: ResMut<Score>,
 ) {
     if let Ok(player_transform) = player_query.get_single() {
         let collision_distance = (PLAYER_SIZE + ENEMY_SIZE) / 2.0;
@@ -293,6 +307,13 @@ pub fn player_hit_star(
             });
 
             commands.entity(star_entity).despawn();
+            score.value += 1;
         }
+    }
+}
+
+pub fn update_score(score: Res<Score>) {
+    if score.is_changed() {
+        println!("Score: {}", score.value.to_string())
     }
 }
