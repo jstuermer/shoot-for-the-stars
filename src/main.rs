@@ -13,6 +13,7 @@ pub const ENEMY_TIMESTEP: f32 = 1.0;
 pub const COLLISION_REBOUND_STRENGTH: f32 = 50.0;
 pub const NUMBER_OF_STARS: usize = 10;
 pub const STAR_SPAWN_TIME: f32 = 1.0;
+pub const PLAYER_START_HEALTH: u32 = 3;
 
 fn main() {
     App::new()
@@ -35,6 +36,7 @@ fn main() {
                 update_score,
                 tick_star_spawn_timer,
                 spawn_stars_over_time,
+                kill_player_without_health,
             ),
         )
         .add_systems(
@@ -47,6 +49,11 @@ fn main() {
 
 #[derive(Component)]
 pub struct Player {}
+
+#[derive(Component)]
+pub struct Health {
+    current: u32,
+}
 
 #[derive(Component)]
 pub struct Enemy {
@@ -88,6 +95,9 @@ pub fn spawn_player(
             ..default()
         },
         Player {},
+        Health {
+            current: PLAYER_START_HEALTH,
+        },
     ));
 }
 
@@ -263,11 +273,11 @@ pub fn confine_player_movement(
 
 pub fn player_hit_enemy(
     mut commands: Commands,
-    mut player_query: Query<&mut Transform, (With<Player>, Without<Enemy>)>,
+    mut player_query: Query<(&mut Transform, &mut Health), (With<Player>, Without<Enemy>)>,
     mut enemy_query: Query<&mut Transform, With<Enemy>>,
     asset_server: Res<AssetServer>,
 ) {
-    if let Ok(mut player_transform) = player_query.get_single_mut() {
+    if let Ok((mut player_transform, mut player_health)) = player_query.get_single_mut() {
         let collision_distance = (PLAYER_SIZE + ENEMY_SIZE) / 2.0;
         for mut enemy_transform in &mut enemy_query {
             let mut relative_vector_in_plane = Vec3 {
@@ -288,7 +298,24 @@ pub fn player_hit_enemy(
             relative_vector_in_plane = relative_vector_in_plane.normalize_or_zero();
             enemy_transform.translation -= COLLISION_REBOUND_STRENGTH * relative_vector_in_plane;
             player_transform.translation += COLLISION_REBOUND_STRENGTH * relative_vector_in_plane;
+
+            player_health.current -= 1;
+            println!("You lost a health point ({} left)!", player_health.current)
         }
+    }
+}
+
+pub fn kill_player_without_health(
+    mut commands: Commands,
+    player_query: Query<(Entity, &Health), With<Player>>,
+) {
+    if let Ok((player_entity, player_health)) = player_query.get_single() {
+        if player_health.current > 0 {
+            return;
+        }
+
+        commands.entity(player_entity).despawn();
+        println!("You died!")
     }
 }
 
