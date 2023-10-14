@@ -20,8 +20,10 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .init_resource::<Score>()
+        .init_resource::<HighScores>()
         .init_resource::<EnemySpawnTimer>()
         .init_resource::<StarSpawnTimer>()
+        .add_event::<GameOver>()
         .add_systems(
             Startup,
             (spawn_camera, spawn_player, spawn_enemies, spawn_stars),
@@ -40,7 +42,10 @@ fn main() {
                 spawn_enemies_over_time,
                 tick_star_spawn_timer,
                 spawn_stars_over_time,
-                kill_player_without_health,
+                check_player_health,
+                handle_game_over,
+                update_high_scores.after(player_hit_enemy),
+                high_scores_updated.after(update_high_scores),
             ),
         )
         .add_systems(
@@ -96,6 +101,16 @@ impl Default for StarSpawnTimer {
 #[derive(Resource, Default)]
 pub struct Score {
     pub value: u32,
+}
+
+#[derive(Resource, Default, Debug)]
+pub struct HighScores {
+    pub scores: Vec<(String, u32)>,
+}
+
+#[derive(Event)]
+pub struct GameOver {
+    pub score: u32,
 }
 
 pub fn spawn_player(
@@ -241,8 +256,8 @@ pub fn confine_enemy_movement(
 }
 
 pub fn player_movement(
-    keyboard_input: Res<Input<KeyCode>>,
     mut player_query: Query<&mut Transform, With<Player>>,
+    keyboard_input: Res<Input<KeyCode>>,
     time: Res<Time>,
 ) {
     if let Ok(mut player_transform) = player_query.get_single_mut() {
@@ -290,8 +305,8 @@ pub fn confine_player_movement(
 
 pub fn player_hit_enemy(
     mut commands: Commands,
-    mut player_query: Query<(&mut Transform, &mut Health), (With<Player>, Without<Enemy>)>,
     mut enemy_query: Query<&mut Transform, With<Enemy>>,
+    mut player_query: Query<(&mut Transform, &mut Health), (With<Player>, Without<Enemy>)>,
     asset_server: Res<AssetServer>,
 ) {
     if let Ok((mut player_transform, mut player_health)) = player_query.get_single_mut() {
@@ -322,17 +337,29 @@ pub fn player_hit_enemy(
     }
 }
 
-pub fn kill_player_without_health(
-    mut commands: Commands,
-    player_query: Query<(Entity, &Health), With<Player>>,
+pub fn check_player_health(
+    mut game_over_event_writer: EventWriter<GameOver>,
+    player_query: Query<&Health, With<Player>>,
+    score: Res<Score>,
 ) {
-    if let Ok((player_entity, player_health)) = player_query.get_single() {
+    if let Ok(player_health) = player_query.get_single() {
         if player_health.current > 0 {
             return;
         }
+        game_over_event_writer.send(GameOver { score: score.value });
+    }
+}
 
-        commands.entity(player_entity).despawn();
-        println!("You died!")
+pub fn handle_game_over(
+    mut commands: Commands,
+    mut game_over_event_reader: EventReader<GameOver>,
+    player_query: Query<Entity, With<Player>>,
+) {
+    for event in &mut game_over_event_reader {
+        if let Ok(player_entity) = player_query.get_single() {
+            commands.entity(player_entity).despawn();
+            println!("You died! Your final score is: {}", event.score);
+        }
     }
 }
 
@@ -369,7 +396,24 @@ pub fn player_hit_star(
 
 pub fn update_score(score: Res<Score>) {
     if score.is_changed() {
-        println!("Score: {}", score.value.to_string())
+        println!("Score: {}", score.value)
+    }
+}
+
+pub fn update_high_scores(
+    mut game_over_event_reader: EventReader<GameOver>,
+    mut high_scores: ResMut<HighScores>,
+) {
+    for event in &mut game_over_event_reader {
+        high_scores
+            .scores
+            .push(("Player name:".to_string(), event.score));
+    }
+}
+
+pub fn high_scores_updated(high_scores: Res<HighScores>) {
+    if high_scores.is_changed() {
+        println!("Your high scores are: {:?}", high_scores);
     }
 }
 
@@ -379,9 +423,9 @@ pub fn tick_star_spawn_timer(mut star_spawn_timer: ResMut<StarSpawnTimer>, time:
 
 pub fn spawn_stars_over_time(
     mut commands: Commands,
-    star_spawn_timer: Res<StarSpawnTimer>,
     window_query: Query<&Window, With<PrimaryWindow>>,
     asset_server: Res<AssetServer>,
+    star_spawn_timer: Res<StarSpawnTimer>,
 ) {
     if !star_spawn_timer.timer.finished() {
         return;
@@ -410,9 +454,9 @@ pub fn tick_enemy_spawn_timer(mut enemy_spawn_timer: ResMut<EnemySpawnTimer>, ti
 
 pub fn spawn_enemies_over_time(
     mut commands: Commands,
-    enemy_spawn_timer: Res<EnemySpawnTimer>,
     window_query: Query<&Window, With<PrimaryWindow>>,
     asset_server: Res<AssetServer>,
+    enemy_spawn_timer: Res<EnemySpawnTimer>,
 ) {
     if !enemy_spawn_timer.timer.finished() {
         return;
