@@ -14,8 +14,8 @@ impl Plugin for PlayerPlugin {
             (
                 player_movement,
                 confine_player_movement.after(player_movement),
-                player_hit_enemy,
                 player_hit_star,
+                (player_hit_enemy, check_player_health, handle_game_over).chain(),
             ),
         );
     }

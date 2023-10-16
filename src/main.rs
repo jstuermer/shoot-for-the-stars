@@ -28,6 +28,5 @@ fn main() {
             StarPlugin,
         ))
         .add_systems(Startup, spawn_camera)
-        .add_systems(Update, (check_player_health, handle_game_over))
         .run();
 }

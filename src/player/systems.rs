@@ -4,6 +4,7 @@ use super::components::*;
 use crate::components::Health;
 use crate::enemy::components::Enemy;
 use crate::enemy::ENEMY_SIZE;
+use crate::events::GameOver;
 use crate::score::resources::Score;
 use crate::star::components::Star;
 use crate::star::STAR_SIZE;
@@ -143,6 +144,32 @@ pub fn player_hit_enemy(
 
             player_health.current -= 1;
             println!("You lost a health point ({} left)!", player_health.current)
+        }
+    }
+}
+
+pub fn check_player_health(
+    mut game_over_event_writer: EventWriter<GameOver>,
+    player_query: Query<&Health, With<Player>>,
+    score: Res<Score>,
+) {
+    if let Ok(player_health) = player_query.get_single() {
+        if player_health.current > 0 {
+            return;
+        }
+        game_over_event_writer.send(GameOver { score: score.value });
+    }
+}
+
+pub fn handle_game_over(
+    mut commands: Commands,
+    mut game_over_event_reader: EventReader<GameOver>,
+    player_query: Query<Entity, With<Player>>,
+) {
+    for event in &mut game_over_event_reader {
+        if let Ok(player_entity) = player_query.get_single() {
+            commands.entity(player_entity).despawn();
+            println!("You died! Your final score is: {}", event.score);
         }
     }
 }
