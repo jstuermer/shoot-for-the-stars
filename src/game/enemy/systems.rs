@@ -33,6 +33,12 @@ pub fn spawn_enemies(
     }
 }
 
+pub fn despawn_enemies(mut commands: Commands, enemy_query: Query<Entity, With<Enemy>>) {
+    for enemy_entity in &enemy_query {
+        commands.entity(enemy_entity).despawn();
+    }
+}
+
 pub fn enemy_redirection(mut enemy_query: Query<&mut Enemy>) {
     let sample_directions: [f32; 3] = [-1.0, 0.0, 1.0];
     let mut rng: rand::rngs::ThreadRng = rand::thread_rng();

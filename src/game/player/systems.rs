@@ -8,7 +8,7 @@ use crate::game::enemy::ENEMY_SIZE;
 use crate::game::score::resources::Score;
 use crate::game::star::components::Star;
 use crate::game::star::STAR_SIZE;
-use crate::utils;
+use crate::{utils, AppState};
 
 pub const PLAYER_SIZE: f32 = 64.0; // this is the size of the player sprite
 pub const PLAYER_SPEED: f32 = 500.0;
@@ -33,6 +33,12 @@ pub fn spawn_player(
             current: PLAYER_START_HEALTH,
         },
     ));
+}
+
+pub fn despawn_player(mut commands: Commands, player_query: Query<Entity, With<Player>>) {
+    for player_entity in &player_query {
+        commands.entity(player_entity).despawn();
+    }
 }
 
 pub fn player_movement(
@@ -165,10 +171,12 @@ pub fn handle_game_over(
     mut commands: Commands,
     mut game_over_event_reader: EventReader<GameOver>,
     player_query: Query<Entity, With<Player>>,
+    mut next_app_state: ResMut<NextState<AppState>>,
 ) {
     for event in &mut game_over_event_reader {
         if let Ok(player_entity) = player_query.get_single() {
             commands.entity(player_entity).despawn();
+            next_app_state.set(AppState::GameOver);
             println!("You died! Your final score is: {}", event.score);
         }
     }
