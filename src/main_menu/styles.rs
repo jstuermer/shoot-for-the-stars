@@ -1,6 +1,14 @@
+use crate::Color::Rgba;
 use bevy::prelude::*;
 
-pub const NORMAL_BACKGROUND_COLOR: Color = Color::DARK_GRAY;
+pub const NORMAL_BUTTON_COLOR: Color = Rgba {
+    red: 0.25,
+    green: 0.25,
+    blue: 0.25,
+    alpha: 0.7,
+}; // Color::DARK_GRAY with smaller alpha
+pub const HOVERED_BUTTON_COLOR: Color = Color::DARK_GRAY;
+pub const PRESSED_BUTTON_COLOR: Color = Color::BLACK;
 
 pub const NORMAL_BUTTON_STYLE: Style = {
     let mut style = Style::DEFAULT;

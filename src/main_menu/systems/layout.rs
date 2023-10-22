@@ -66,7 +66,7 @@ pub fn build_main_menu(commands: &mut Commands, asset_server: &Res<AssetServer>)
                 .spawn((
                     ButtonBundle {
                         style: NORMAL_BUTTON_STYLE,
-                        background_color: NORMAL_BACKGROUND_COLOR.into(),
+                        background_color: NORMAL_BUTTON_COLOR.into(),
                         ..default()
                     },
                     PlayButton {},
@@ -91,7 +91,7 @@ pub fn build_main_menu(commands: &mut Commands, asset_server: &Res<AssetServer>)
                 .spawn((
                     ButtonBundle {
                         style: NORMAL_BUTTON_STYLE,
-                        background_color: NORMAL_BACKGROUND_COLOR.into(),
+                        background_color: NORMAL_BUTTON_COLOR.into(),
                         ..default()
                     },
                     QuitButton {},
