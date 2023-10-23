@@ -13,7 +13,7 @@ pub fn remove_score(mut commands: Commands) {
 
 pub fn update_score(score: Res<Score>) {
     if score.is_changed() {
-        println!("Score: {}", score.value)
+        println!("{}", score.value)
     }
 }
 

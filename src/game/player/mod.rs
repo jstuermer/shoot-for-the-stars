@@ -8,6 +8,8 @@ use systems::*;
 use super::SimulationState;
 use crate::AppState;
 
+pub const PLAYER_START_HEALTH: u32 = 3;
+
 pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {

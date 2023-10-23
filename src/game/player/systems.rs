@@ -1,8 +1,8 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
-use super::components::*;
-use crate::components::Health;
+use super::{components::*, PLAYER_START_HEALTH};
 use crate::events::GameOver;
+use crate::game::components::Health;
 use crate::game::enemy::components::Enemy;
 use crate::game::enemy::ENEMY_SIZE;
 use crate::game::score::resources::Score;
@@ -12,7 +12,6 @@ use crate::{utils, AppState};
 
 pub const PLAYER_SIZE: f32 = 64.0; // this is the size of the player sprite
 pub const PLAYER_SPEED: f32 = 500.0;
-pub const PLAYER_START_HEALTH: u32 = 3;
 pub const COLLISION_REBOUND_STRENGTH: f32 = 50.0;
 
 pub fn spawn_player(

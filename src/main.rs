@@ -1,4 +1,3 @@
-pub mod components;
 mod events;
 mod game;
 mod main_menu;
