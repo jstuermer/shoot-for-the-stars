@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
 use crate::game::{
+    enemy::NUMBER_OF_ENEMIES,
     player::PLAYER_START_HEALTH,
     score::resources::Score,
     ui::hud::{components::*, styles::*},
@@ -19,7 +20,7 @@ fn build_hud(commands: &mut Commands, asset_server: &Res<AssetServer>) -> Entity
             },
             GameHUD {},
         ))
-        // Info bar at the top of the screen
+        // Info bar at the top-left of the screen
         .with_children(|parent| {
             parent
                 .spawn(NodeBundle {
@@ -27,7 +28,7 @@ fn build_hud(commands: &mut Commands, asset_server: &Res<AssetServer>) -> Entity
                     background_color: INFO_BAR_COLOR.into(),
                     ..default()
                 })
-                // Score info on the left
+                // Score info at the top
                 .with_children(|parent| {
                     parent
                         .spawn(NodeBundle {
@@ -78,6 +79,33 @@ fn build_hud(commands: &mut Commands, asset_server: &Res<AssetServer>) -> Entity
                                     get_text_style(32.0, &asset_server),
                                 ),
                                 HealthInfo {},
+                            ));
+                        });
+                })
+                // Number of enemies info at the bottom
+                .with_children(|parent| {
+                    parent
+                        .spawn(NodeBundle {
+                            style: INFO_ITEM_STYLE,
+                            ..default()
+                        })
+                        .with_children(|parent| {
+                            let icon = asset_server.load("sprites/ball_red_large.png");
+                            parent.spawn(ImageBundle {
+                                image: UiImage::new(icon),
+                                style: Style {
+                                    width: Val::Px(30.0),
+                                    height: Val::Px(30.0),
+                                    ..default()
+                                },
+                                ..default()
+                            });
+                            parent.spawn((
+                                TextBundle::from_section(
+                                    format!("{:?}", NUMBER_OF_ENEMIES),
+                                    get_text_style(32.0, &asset_server),
+                                ),
+                                EnemyNumberInfo {},
                             ));
                         });
                 });

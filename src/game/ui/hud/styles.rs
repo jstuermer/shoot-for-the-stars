@@ -18,8 +18,8 @@ pub const HUD_STYLE: Style = {
 
 pub const INFO_BAR_STYLE: Style = {
     let mut style = Style::DEFAULT;
-    style.width = Val::Percent(7.0);
-    style.height = Val::Percent(15.0);
+    style.width = Val::Percent(8.0);
+    style.height = Val::Percent(20.0);
     style.top = Val::Px(10.0);
     style.left = Val::Px(10.0);
     style.flex_direction = FlexDirection::Column;

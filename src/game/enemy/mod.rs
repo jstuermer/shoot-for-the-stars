@@ -11,8 +11,8 @@ use super::SimulationState;
 use crate::AppState;
 
 pub const ENEMY_SIZE: f32 = 64.0; // this is the size of the enemy sprite
+pub const NUMBER_OF_ENEMIES: usize = 4;
 const ENEMY_SPEED: f32 = 200.0;
-const NUMBER_OF_ENEMIES: usize = 4;
 const ENEMY_TIMESTEP: f32 = 1.0;
 
 pub struct EnemyPlugin;

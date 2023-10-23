@@ -8,3 +8,6 @@ pub struct ScoreInfo {}
 
 #[derive(Component)]
 pub struct HealthInfo {}
+
+#[derive(Component)]
+pub struct EnemyNumberInfo {}

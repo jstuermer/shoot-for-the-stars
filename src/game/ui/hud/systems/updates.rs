@@ -2,9 +2,10 @@ use bevy::prelude::*;
 
 use crate::game::{
     components::Health,
+    enemy::components::Enemy,
     player::components::Player,
     score::resources::Score,
-    ui::hud::components::{GameHUD, HealthInfo, ScoreInfo},
+    ui::hud::components::{EnemyNumberInfo, GameHUD, HealthInfo, ScoreInfo},
 };
 
 pub fn update_score_info(
@@ -26,6 +27,16 @@ pub fn update_health_info(
         if let Ok(mut text) = health_info_query.get_single_mut() {
             text.sections[0].value = format!("{:?}", player_health.current);
         }
+    }
+}
+
+pub fn update_enemy_number_info(
+    mut enemy_number_info_query: Query<&mut Text, With<EnemyNumberInfo>>,
+    enemy_query: Query<Entity, With<Enemy>>,
+) {
+    if let Ok(mut text) = enemy_number_info_query.get_single_mut() {
+        let number_of_enemies = enemy_query.iter().count();
+        text.sections[0].value = format!("{:?}", number_of_enemies);
     }
 }
 
