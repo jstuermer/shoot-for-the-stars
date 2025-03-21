@@ -8,11 +8,10 @@ use crate::{
     AppState,
 };
 
+type PlayButtonInteraction = (Changed<Interaction>, With<PlayButton>);
+
 pub fn interact_with_play_button(
-    mut button_query: Query<
-        (&Interaction, &mut BackgroundColor),
-        (Changed<Interaction>, With<PlayButton>),
-    >,
+    mut button_query: Query<(&Interaction, &mut BackgroundColor), PlayButtonInteraction>,
     mut next_app_state: ResMut<NextState<AppState>>,
 ) {
     if let Ok((interaction, mut background_color)) = button_query.get_single_mut() {
@@ -31,12 +30,11 @@ pub fn interact_with_play_button(
     }
 }
 
+type QuitButtonInteraction = (Changed<Interaction>, With<QuitButton>);
+
 pub fn interact_with_quit_button(
     mut app_exit_event_writer: EventWriter<AppExit>,
-    mut button_query: Query<
-        (&Interaction, &mut BackgroundColor),
-        (Changed<Interaction>, With<QuitButton>),
-    >,
+    mut button_query: Query<(&Interaction, &mut BackgroundColor), QuitButtonInteraction>,
 ) {
     if let Ok((interaction, mut background_color)) = button_query.get_single_mut() {
         match *interaction {

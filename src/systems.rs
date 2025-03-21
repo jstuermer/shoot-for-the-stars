@@ -17,12 +17,10 @@ pub fn transition_to_game_state(
     mut next_app_state: ResMut<NextState<AppState>>,
     mut next_simulation_state: ResMut<NextState<SimulationState>>,
 ) {
-    if keyboard_input.just_pressed(KeyCode::G) {
-        if *app_state.get() != AppState::Game {
-            next_app_state.set(AppState::Game);
-            next_simulation_state.set(SimulationState::Running);
-            println!("App in Game state.");
-        }
+    if keyboard_input.just_pressed(KeyCode::G) && *app_state.get() != AppState::Game {
+        next_app_state.set(AppState::Game);
+        next_simulation_state.set(SimulationState::Running);
+        println!("App in Game state.");
     }
 }
 
@@ -32,11 +30,9 @@ pub fn transition_to_main_menu_state(
     mut next_app_state: ResMut<NextState<AppState>>,
     mut next_simulation_state: ResMut<NextState<SimulationState>>,
 ) {
-    if keyboard_input.just_pressed(KeyCode::M) {
-        if *app_state.get() != AppState::MainMenu {
-            next_app_state.set(AppState::MainMenu);
-            next_simulation_state.set(SimulationState::Paused);
-            println!("App in MainMenu state.");
-        }
+    if keyboard_input.just_pressed(KeyCode::M) && *app_state.get() != AppState::MainMenu {
+        next_app_state.set(AppState::MainMenu);
+        next_simulation_state.set(SimulationState::Paused);
+        println!("App in MainMenu state.");
     }
 }

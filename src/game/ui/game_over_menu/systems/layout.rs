@@ -20,7 +20,7 @@ fn build_game_over_menu(
     asset_server: &Res<AssetServer>,
     final_score: u32,
 ) -> Entity {
-    let game_over_menu_entity: Entity = commands
+    commands
         .spawn((
             NodeBundle {
                 style: GAME_OVER_MENU_STYLE,
@@ -50,21 +50,19 @@ fn build_game_over_menu(
                     parent.spawn((
                         TextBundle::from_section(
                             format!("Final score: {:?}", final_score),
-                            get_text_style(54.0, &asset_server),
+                            get_text_style(54.0, asset_server),
                         ),
                         FinalScoreInfo {},
                     ));
                 });
         })
-        .id();
-
-    return game_over_menu_entity;
+        .id()
 }
 
 fn get_final_score(mut game_over_event_reader: EventReader<GameOver>) -> u32 {
-    for event in &mut game_over_event_reader {
+    if let Some(event) = (&mut game_over_event_reader).into_iter().next() {
         return event.score;
     }
 
-    return 0;
+    0
 }

@@ -16,7 +16,7 @@ pub fn despawn_main_menu(mut commands: Commands, query: Query<Entity, With<MainM
 }
 
 pub fn build_main_menu(commands: &mut Commands, asset_server: &Res<AssetServer>) -> Entity {
-    let main_menu_entity = commands
+    commands
         .spawn((
             NodeBundle {
                 style: MAIN_MENU_STYLE,
@@ -44,7 +44,7 @@ pub fn build_main_menu(commands: &mut Commands, asset_server: &Res<AssetServer>)
                         text: Text {
                             sections: vec![TextSection::new(
                                 "Bevy Ball Game",
-                                get_text_style(64.0, &asset_server),
+                                get_text_style(64.0, asset_server),
                             )],
                             alignment: TextAlignment::Center,
                             ..default()
@@ -76,7 +76,7 @@ pub fn build_main_menu(commands: &mut Commands, asset_server: &Res<AssetServer>)
                         text: Text {
                             sections: vec![TextSection::new(
                                 "Play",
-                                get_text_style(32.0, &asset_server),
+                                get_text_style(32.0, asset_server),
                             )],
                             alignment: TextAlignment::Center,
                             ..default()
@@ -101,7 +101,7 @@ pub fn build_main_menu(commands: &mut Commands, asset_server: &Res<AssetServer>)
                         text: Text {
                             sections: vec![TextSection::new(
                                 "Quit",
-                                get_text_style(32.0, &asset_server),
+                                get_text_style(32.0, asset_server),
                             )],
                             alignment: TextAlignment::Center,
                             ..default()
@@ -110,7 +110,5 @@ pub fn build_main_menu(commands: &mut Commands, asset_server: &Res<AssetServer>)
                     });
                 });
         })
-        .id();
-
-    return main_menu_entity;
+        .id()
 }

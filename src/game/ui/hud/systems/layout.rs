@@ -12,7 +12,7 @@ pub fn spawn_game_hud(mut commands: Commands, asset_server: Res<AssetServer>) {
 }
 
 fn build_hud(commands: &mut Commands, asset_server: &Res<AssetServer>) -> Entity {
-    let hud_entity: Entity = commands
+    commands
         .spawn((
             NodeBundle {
                 style: HUD_STYLE,
@@ -49,7 +49,7 @@ fn build_hud(commands: &mut Commands, asset_server: &Res<AssetServer>) -> Entity
                             parent.spawn((
                                 TextBundle::from_section(
                                     format!("{:?}", Score::default().value),
-                                    get_text_style(32.0, &asset_server),
+                                    get_text_style(32.0, asset_server),
                                 ),
                                 ScoreInfo {},
                             ));
@@ -76,7 +76,7 @@ fn build_hud(commands: &mut Commands, asset_server: &Res<AssetServer>) -> Entity
                             parent.spawn((
                                 TextBundle::from_section(
                                     format!("{:?}", PLAYER_START_HEALTH),
-                                    get_text_style(32.0, &asset_server),
+                                    get_text_style(32.0, asset_server),
                                 ),
                                 HealthInfo {},
                             ));
@@ -103,14 +103,12 @@ fn build_hud(commands: &mut Commands, asset_server: &Res<AssetServer>) -> Entity
                             parent.spawn((
                                 TextBundle::from_section(
                                     format!("{:?}", NUMBER_OF_ENEMIES),
-                                    get_text_style(32.0, &asset_server),
+                                    get_text_style(32.0, asset_server),
                                 ),
                                 EnemyNumberInfo {},
                             ));
                         });
                 });
         })
-        .id();
-
-    return hud_entity;
+        .id()
 }

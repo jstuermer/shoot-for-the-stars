@@ -119,10 +119,12 @@ pub fn player_hit_star(
     }
 }
 
+type OnlyPlayer = (With<Player>, Without<Enemy>);
+
 pub fn player_hit_enemy(
     mut commands: Commands,
     mut enemy_query: Query<&mut Transform, With<Enemy>>,
-    mut player_query: Query<(&mut Transform, &mut Health), (With<Player>, Without<Enemy>)>,
+    mut player_query: Query<(&mut Transform, &mut Health), OnlyPlayer>,
     asset_server: Res<AssetServer>,
 ) {
     if let Ok((mut player_transform, mut player_health)) = player_query.get_single_mut() {

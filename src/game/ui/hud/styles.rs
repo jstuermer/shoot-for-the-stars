@@ -36,9 +36,9 @@ pub const INFO_ITEM_STYLE: Style = {
 };
 
 pub fn get_text_style(font_size: f32, asset_server: &Res<AssetServer>) -> TextStyle {
-    return TextStyle {
+    TextStyle {
         font: asset_server.load("fonts/FiraSans-Bold.ttf"),
         font_size,
         color: Color::WHITE,
-    };
+    }
 }
