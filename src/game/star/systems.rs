@@ -20,11 +20,8 @@ pub fn spawn_stars(
         let y_position: f32 = rng.gen_range(y_min..=y_max);
 
         commands.spawn((
-            SpriteBundle {
-                transform: Transform::from_xyz(x_position, y_position, 0.0),
-                texture: asset_server.load("sprites/star.png"),
-                ..default()
-            },
+            Sprite::from_image(asset_server.load("sprites/star.png")),
+            Transform::from_xyz(x_position, y_position, 0.0),
             Star {},
         ));
     }
@@ -52,11 +49,8 @@ pub fn spawn_stars_over_time(
     let y_position: f32 = rng.gen_range(y_min..=y_max);
 
     commands.spawn((
-        SpriteBundle {
-            transform: Transform::from_xyz(x_position, y_position, 0.0),
-            texture: asset_server.load("sprites/star.png"),
-            ..default()
-        },
+        Sprite::from_image(asset_server.load("sprites/star.png")),
+        Transform::from_xyz(x_position, y_position, 0.0),
         Star {},
     ));
 }

@@ -22,11 +22,8 @@ pub fn spawn_player(
     let window: &Window = window_query.get_single().unwrap();
 
     commands.spawn((
-        SpriteBundle {
-            transform: Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 0.0),
-            texture: asset_server.load("sprites/ball_blue_large.png"),
-            ..default()
-        },
+        Sprite::from_image(asset_server.load("sprites/ball_blue_large.png")),
+        Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 0.0),
         Player {},
         Health {
             current: PLAYER_START_HEALTH,
@@ -42,28 +39,28 @@ pub fn despawn_player(mut commands: Commands, player_query: Query<Entity, With<P
 
 pub fn player_movement(
     mut player_query: Query<&mut Transform, With<Player>>,
-    keyboard_input: Res<Input<KeyCode>>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
     time: Res<Time>,
 ) {
     if let Ok(mut player_transform) = player_query.get_single_mut() {
         let mut direction = Vec3::ZERO;
 
-        if keyboard_input.pressed(KeyCode::Left) || keyboard_input.pressed(KeyCode::A) {
+        if keyboard_input.pressed(KeyCode::ArrowLeft) || keyboard_input.pressed(KeyCode::KeyA) {
             direction += Vec3::new(-1.0, 0.0, 0.0)
         }
-        if keyboard_input.pressed(KeyCode::Right) || keyboard_input.pressed(KeyCode::D) {
+        if keyboard_input.pressed(KeyCode::ArrowRight) || keyboard_input.pressed(KeyCode::KeyD) {
             direction += Vec3::new(1.0, 0.0, 0.0)
         }
-        if keyboard_input.pressed(KeyCode::Down) || keyboard_input.pressed(KeyCode::S) {
+        if keyboard_input.pressed(KeyCode::ArrowDown) || keyboard_input.pressed(KeyCode::KeyS) {
             direction += Vec3::new(0.0, -1.0, 0.0)
         }
-        if keyboard_input.pressed(KeyCode::Up) || keyboard_input.pressed(KeyCode::W) {
+        if keyboard_input.pressed(KeyCode::ArrowUp) || keyboard_input.pressed(KeyCode::KeyW) {
             direction += Vec3::new(0.0, 1.0, 0.0)
         }
 
         direction = direction.normalize_or_zero();
 
-        player_transform.translation += direction * PLAYER_SPEED * time.delta_seconds();
+        player_transform.translation += direction * PLAYER_SPEED * time.delta_secs();
     }
 }
 
@@ -108,10 +105,10 @@ pub fn player_hit_star(
                 continue;
             }
 
-            commands.spawn(AudioBundle {
-                source: asset_server.load("audio/laserLarge_000.ogg"),
-                settings: PlaybackSettings::DESPAWN,
-            });
+            commands.spawn((
+                AudioPlayer::<AudioSource>(asset_server.load("audio/laserLarge_000.ogg")),
+                PlaybackSettings::DESPAWN,
+            ));
 
             commands.entity(star_entity).despawn();
             score.value += 1;
@@ -140,10 +137,10 @@ pub fn player_hit_enemy(
                 continue;
             }
 
-            commands.spawn(AudioBundle {
-                source: asset_server.load("audio/explosionCrunch_000.ogg"),
-                settings: PlaybackSettings::DESPAWN,
-            });
+            commands.spawn((
+                AudioPlayer::<AudioSource>(asset_server.load("audio/explosionCrunch_000.ogg")),
+                PlaybackSettings::DESPAWN,
+            ));
 
             relative_vector_in_plane = relative_vector_in_plane.normalize_or_zero();
             enemy_transform.translation -= COLLISION_REBOUND_STRENGTH * relative_vector_in_plane;
@@ -174,7 +171,7 @@ pub fn handle_game_over(
     player_query: Query<Entity, With<Player>>,
     mut next_app_state: ResMut<NextState<AppState>>,
 ) {
-    for event in &mut game_over_event_reader {
+    for event in &mut game_over_event_reader.read() {
         if let Ok(player_entity) = player_query.get_single() {
             commands.entity(player_entity).despawn();
             next_app_state.set(AppState::GameOver);

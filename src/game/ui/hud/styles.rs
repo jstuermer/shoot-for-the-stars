@@ -1,44 +1,36 @@
-use crate::Color::Rgba;
+use crate::Srgba;
 use bevy::prelude::*;
 
-pub const INFO_BAR_COLOR: Color = Rgba {
+pub const INFO_BAR_COLOR: Srgba = Srgba {
     red: 0.25,
     green: 0.25,
     blue: 0.25,
     alpha: 0.7,
 }; // Color::DARK_GRAY with smaller alpha
 
-pub const HUD_STYLE: Style = {
-    let mut style = Style::DEFAULT;
-    style.width = Val::Percent(100.0);
-    style.height = Val::Percent(100.0);
-    style.flex_direction = FlexDirection::Column;
-    style
+pub const HUD_NODE: Node = {
+    let mut node = Node::DEFAULT;
+    node.width = Val::Percent(100.0);
+    node.height = Val::Percent(100.0);
+    node.flex_direction = FlexDirection::Column;
+    node
 };
 
-pub const INFO_BAR_STYLE: Style = {
-    let mut style = Style::DEFAULT;
-    style.width = Val::Percent(8.0);
-    style.height = Val::Percent(20.0);
-    style.top = Val::Px(10.0);
-    style.left = Val::Px(10.0);
-    style.flex_direction = FlexDirection::Column;
-    style.justify_content = JustifyContent::Center;
-    style.row_gap = Val::Px(10.0);
-    style
+pub const INFO_BAR_NODE: Node = {
+    let mut node = Node::DEFAULT;
+    node.width = Val::Percent(8.0);
+    node.height = Val::Percent(20.0);
+    node.top = Val::Px(10.0);
+    node.left = Val::Px(10.0);
+    node.flex_direction = FlexDirection::Column;
+    node.align_items = AlignItems::Center;
+    node.row_gap = Val::Px(10.0);
+    node
 };
 
-pub const INFO_ITEM_STYLE: Style = {
-    let mut style = Style::DEFAULT;
-    style.left = Val::Px(10.0);
-    style.column_gap = Val::Px(10.0);
-    style
+pub const INFO_ITEM_NODE: Node = {
+    let mut node = Node::DEFAULT;
+    node.top = Val::Px(5.0);
+    node.column_gap = Val::Px(10.0);
+    node
 };
-
-pub fn get_text_style(font_size: f32, asset_server: &Res<AssetServer>) -> TextStyle {
-    TextStyle {
-        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-        font_size,
-        color: Color::WHITE,
-    }
-}

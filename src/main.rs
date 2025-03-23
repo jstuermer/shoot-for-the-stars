@@ -13,7 +13,7 @@ use systems::*;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_state::<AppState>()
+        .init_state::<AppState>()
         .add_plugins((MainMenuPlugin, GamePlugin))
         .add_systems(Startup, spawn_camera)
         .add_systems(

@@ -21,11 +21,8 @@ pub fn spawn_enemies(
         let y_position: f32 = rng.gen_range(y_min..=y_max);
 
         commands.spawn((
-            SpriteBundle {
-                transform: Transform::from_xyz(x_position, y_position, 0.0),
-                texture: asset_server.load("sprites/ball_red_large.png"),
-                ..default()
-            },
+            Sprite::from_image(asset_server.load("sprites/ball_red_large.png")),
+            Transform::from_xyz(x_position, y_position, 0.0),
             Enemy {
                 direction: Vec3::ZERO,
             },
@@ -58,7 +55,7 @@ pub fn enemy_redirection(mut enemy_query: Query<&mut Enemy>) {
 
 pub fn enemy_movement(mut enemy_query: Query<(&mut Transform, &Enemy)>, time: Res<Time>) {
     for (mut enemy_transform, enemy) in &mut enemy_query {
-        enemy_transform.translation += enemy.direction * ENEMY_SPEED * time.delta_seconds();
+        enemy_transform.translation += enemy.direction * ENEMY_SPEED * time.delta_secs();
     }
 }
 
@@ -94,10 +91,10 @@ pub fn confine_enemy_movement(
         }
 
         if changed_direction {
-            commands.spawn(AudioBundle {
-                source: asset_server.load("audio/pluck_001.ogg"),
-                settings: PlaybackSettings::DESPAWN,
-            });
+            commands.spawn((
+                AudioPlayer::<AudioSource>(asset_server.load("audio/pluck_001.ogg")),
+                PlaybackSettings::DESPAWN,
+            ));
         }
     }
 }
@@ -124,11 +121,8 @@ pub fn spawn_enemies_over_time(
     let y_position: f32 = rng.gen_range(y_min..=y_max);
 
     commands.spawn((
-        SpriteBundle {
-            transform: Transform::from_xyz(x_position, y_position, 0.0),
-            texture: asset_server.load("sprites/ball_red_large.png"),
-            ..default()
-        },
+        Sprite::from_image(asset_server.load("sprites/ball_red_large.png")),
+        Transform::from_xyz(x_position, y_position, 0.0),
         Enemy {
             direction: Vec3::ZERO,
         },

@@ -13,14 +13,14 @@ use crate::AppState;
 pub const ENEMY_SIZE: f32 = 64.0; // this is the size of the enemy sprite
 pub const NUMBER_OF_ENEMIES: usize = 4;
 const ENEMY_SPEED: f32 = 200.0;
-const ENEMY_TIMESTEP: f32 = 1.0;
+const ENEMY_TIMESTEP: f64 = 1.0;
 
 pub struct EnemyPlugin;
 
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<EnemySpawnTimer>()
-            .insert_resource(FixedTime::new_from_secs(ENEMY_TIMESTEP))
+            .insert_resource(Time::from_seconds(ENEMY_TIMESTEP))
             .add_systems(OnEnter(AppState::Game), spawn_enemies)
             .add_systems(
                 Update,

@@ -13,102 +13,93 @@ pub fn spawn_game_hud(mut commands: Commands, asset_server: Res<AssetServer>) {
 
 fn build_hud(commands: &mut Commands, asset_server: &Res<AssetServer>) -> Entity {
     commands
-        .spawn((
-            NodeBundle {
-                style: HUD_STYLE,
-                ..default()
-            },
-            GameHUD {},
-        ))
+        .spawn((HUD_NODE, GameHUD))
         // Info bar at the top-left of the screen
         .with_children(|parent| {
             parent
-                .spawn(NodeBundle {
-                    style: INFO_BAR_STYLE,
-                    background_color: INFO_BAR_COLOR.into(),
-                    ..default()
-                })
-                // Score info at the top
+                .spawn((
+                    INFO_BAR_NODE,
+                    BorderRadius::all(Val::Px(10.0)),
+                    BackgroundColor(INFO_BAR_COLOR.into()),
+                ))
                 .with_children(|parent| {
-                    parent
-                        .spawn(NodeBundle {
-                            style: INFO_ITEM_STYLE,
-                            ..default()
-                        })
-                        .with_children(|parent| {
-                            let icon = asset_server.load("sprites/star.png");
-                            parent.spawn(ImageBundle {
-                                image: UiImage::new(icon),
-                                style: Style {
-                                    width: Val::Px(30.0),
-                                    height: Val::Px(30.0),
-                                    ..default()
-                                },
+                    // Score info at the top
+                    parent.spawn(INFO_ITEM_NODE).with_children(|parent| {
+                        parent.spawn((
+                            ImageNode {
+                                image: asset_server.load("sprites/star.png"),
                                 ..default()
-                            });
-                            parent.spawn((
-                                TextBundle::from_section(
-                                    format!("{:?}", Score::default().value),
-                                    get_text_style(32.0, asset_server),
-                                ),
-                                ScoreInfo {},
-                            ));
-                        });
+                            },
+                            Node {
+                                top: Val::Px(3.0),
+                                width: Val::Px(30.0),
+                                height: Val::Px(30.0),
+                                ..default()
+                            },
+                        ));
+                        parent.spawn((
+                            Text::new(format!("{:?}", Score::default().value)),
+                            TextFont {
+                                font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                                font_size: 32.0,
+                                ..default()
+                            },
+                            TextColor(Color::WHITE),
+                            ScoreInfo {},
+                        ));
+                    });
+                    // Player health info in the center
+                    parent.spawn(INFO_ITEM_NODE).with_children(|parent| {
+                        parent.spawn((
+                            ImageNode {
+                                image: asset_server.load("sprites/info_heart.png"),
+                                ..default()
+                            },
+                            Node {
+                                top: Val::Px(5.0),
+                                width: Val::Px(30.0),
+                                height: Val::Px(30.0),
+                                ..default()
+                            },
+                        ));
+                        parent.spawn((
+                            Text::new(format!("{:?}", PLAYER_START_HEALTH)),
+                            TextFont {
+                                font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                                font_size: 32.0,
+                                ..default()
+                            },
+                            TextColor(Color::WHITE),
+                            HealthInfo {},
+                        ));
+                    });
+                    // Number of enemies info at the bottom
+                    parent.spawn(INFO_ITEM_NODE).with_children(|parent| {
+                        parent.spawn((
+                            ImageNode {
+                                image: asset_server.load("sprites/ball_red_large.png"),
+                                ..default()
+                            },
+                            Node {
+                                top: Val::Px(3.0),
+                                width: Val::Px(30.0),
+                                height: Val::Px(30.0),
+                                ..default()
+                            },
+                        ));
+                        parent.spawn((
+                            Text::new(format!("{:?}", NUMBER_OF_ENEMIES)),
+                            TextFont {
+                                font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                                font_size: 32.0,
+                                ..default()
+                            },
+                            TextColor(Color::WHITE),
+                            EnemyNumberInfo {},
+                        ));
+                    });
                 })
-                // Player health info in the center
-                .with_children(|parent| {
-                    parent
-                        .spawn(NodeBundle {
-                            style: INFO_ITEM_STYLE,
-                            ..default()
-                        })
-                        .with_children(|parent| {
-                            let icon = asset_server.load("sprites/info_heart.png");
-                            parent.spawn(ImageBundle {
-                                image: UiImage::new(icon),
-                                style: Style {
-                                    width: Val::Px(30.0),
-                                    height: Val::Px(30.0),
-                                    ..default()
-                                },
-                                ..default()
-                            });
-                            parent.spawn((
-                                TextBundle::from_section(
-                                    format!("{:?}", PLAYER_START_HEALTH),
-                                    get_text_style(32.0, asset_server),
-                                ),
-                                HealthInfo {},
-                            ));
-                        });
-                })
-                // Number of enemies info at the bottom
-                .with_children(|parent| {
-                    parent
-                        .spawn(NodeBundle {
-                            style: INFO_ITEM_STYLE,
-                            ..default()
-                        })
-                        .with_children(|parent| {
-                            let icon = asset_server.load("sprites/ball_red_large.png");
-                            parent.spawn(ImageBundle {
-                                image: UiImage::new(icon),
-                                style: Style {
-                                    width: Val::Px(30.0),
-                                    height: Val::Px(30.0),
-                                    ..default()
-                                },
-                                ..default()
-                            });
-                            parent.spawn((
-                                TextBundle::from_section(
-                                    format!("{:?}", NUMBER_OF_ENEMIES),
-                                    get_text_style(32.0, asset_server),
-                                ),
-                                EnemyNumberInfo {},
-                            ));
-                        });
-                });
+                .with_child((INFO_BAR_NODE, BackgroundColor(INFO_BAR_COLOR.into())));
         })
         .id()
 }

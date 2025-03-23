@@ -21,46 +21,38 @@ fn build_game_over_menu(
     final_score: u32,
 ) -> Entity {
     commands
-        .spawn((
-            NodeBundle {
-                style: GAME_OVER_MENU_STYLE,
-                background_color: Color::GRAY.into(),
-                ..default()
-            },
-            GameOverMenu {},
-        ))
-        // Final score
+        .spawn((GAME_OVER_MENU_NODE, GameOverMenu {}))
         .with_children(|parent| {
-            parent
-                .spawn(NodeBundle {
-                    style: INFO_ITEM_STYLE,
-                    ..default()
-                })
-                .with_children(|parent| {
-                    let icon = asset_server.load("sprites/star.png");
-                    parent.spawn(ImageBundle {
-                        image: UiImage::new(icon),
-                        style: Style {
-                            width: Val::Px(40.0),
-                            height: Val::Px(40.0),
-                            ..default()
-                        },
+            parent.spawn(INFO_ITEM_NODE).with_children(|parent| {
+                parent.spawn((
+                    ImageNode {
+                        image: asset_server.load("sprites/star.png"),
                         ..default()
-                    });
-                    parent.spawn((
-                        TextBundle::from_section(
-                            format!("Final score: {:?}", final_score),
-                            get_text_style(54.0, asset_server),
-                        ),
-                        FinalScoreInfo {},
-                    ));
-                });
+                    },
+                    Node {
+                        top: Val::Px(10.0),
+                        width: Val::Px(40.0),
+                        height: Val::Px(40.0),
+                        ..default()
+                    },
+                ));
+                parent.spawn((
+                    Text::new(format! {"Final score: {:?}", final_score}),
+                    TextFont {
+                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                        font_size: 54.0,
+                        ..default()
+                    },
+                    TextColor(Color::WHITE),
+                    FinalScoreInfo {},
+                ));
+            });
         })
         .id()
 }
 
 fn get_final_score(mut game_over_event_reader: EventReader<GameOver>) -> u32 {
-    if let Some(event) = (&mut game_over_event_reader).into_iter().next() {
+    if let Some(event) = game_over_event_reader.read().next() {
         return event.score;
     }
 

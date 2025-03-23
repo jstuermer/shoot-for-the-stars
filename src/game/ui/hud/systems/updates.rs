@@ -1,3 +1,5 @@
+use std::fmt::Write;
+
 use bevy::prelude::*;
 
 use crate::game::{
@@ -14,7 +16,8 @@ pub fn update_score_info(
 ) {
     if score.is_changed() {
         if let Ok(mut text) = score_info_query.get_single_mut() {
-            text.sections[0].value = format!("{:?}", score.value);
+            text.clear();
+            let _ = text.write_str(&format!("{:?}", score.value));
         }
     }
 }
@@ -25,7 +28,8 @@ pub fn update_health_info(
 ) {
     if let Ok(player_health) = player_health_query.get_single() {
         if let Ok(mut text) = health_info_query.get_single_mut() {
-            text.sections[0].value = format!("{:?}", player_health.current);
+            text.clear();
+            let _ = text.write_str(&format!("{:?}", player_health.current));
         }
     }
 }
@@ -36,7 +40,8 @@ pub fn update_enemy_number_info(
 ) {
     if let Ok(mut text) = enemy_number_info_query.get_single_mut() {
         let number_of_enemies = enemy_query.iter().count();
-        text.sections[0].value = format!("{:?}", number_of_enemies);
+        text.clear();
+        let _ = text.write_str(&format!("{:?}", number_of_enemies));
     }
 }
 

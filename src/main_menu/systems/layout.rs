@@ -17,98 +17,70 @@ pub fn despawn_main_menu(mut commands: Commands, query: Query<Entity, With<MainM
 
 pub fn build_main_menu(commands: &mut Commands, asset_server: &Res<AssetServer>) -> Entity {
     commands
-        .spawn((
-            NodeBundle {
-                style: MAIN_MENU_STYLE,
-                background_color: Color::GRAY.into(),
-                ..default()
-            },
-            MainMenu {},
-        ))
-        // Title
+        .spawn((MAIN_MENU_NODE, MainMenu))
         .with_children(|parent| {
-            parent
-                .spawn(NodeBundle {
-                    style: TITLE_STYLE,
+            // Title
+            parent.spawn(TITLE_NODE).with_children(|parent| {
+                parent.spawn(ImageNode {
+                    image: asset_server.load("sprites/ball_blue_large.png"),
                     ..default()
-                })
-                .with_children(|parent| {
-                    parent.spawn(ImageBundle {
-                        image: UiImage {
-                            texture: asset_server.load("sprites/ball_blue_large.png"),
-                            ..default()
-                        },
-                        ..default()
-                    });
-                    parent.spawn(TextBundle {
-                        text: Text {
-                            sections: vec![TextSection::new(
-                                "Bevy Ball Game",
-                                get_text_style(64.0, asset_server),
-                            )],
-                            alignment: TextAlignment::Center,
-                            ..default()
-                        },
-                        ..default()
-                    });
-                    parent.spawn(ImageBundle {
-                        image: UiImage {
-                            texture: asset_server.load("sprites/ball_red_large.png"),
-                            ..default()
-                        },
-                        ..default()
-                    });
                 });
-        })
-        // Play button
-        .with_children(|parent| {
-            parent
-                .spawn((
-                    ButtonBundle {
-                        style: NORMAL_BUTTON_STYLE,
-                        background_color: NORMAL_BUTTON_COLOR.into(),
+                parent.spawn((
+                    Text::new("Bevy Ball Game"),
+                    TextFont {
+                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                        font_size: 64.0,
                         ..default()
                     },
-                    PlayButton {},
-                ))
-                .with_children(|parent| {
-                    parent.spawn(TextBundle {
-                        text: Text {
-                            sections: vec![TextSection::new(
-                                "Play",
-                                get_text_style(32.0, asset_server),
-                            )],
-                            alignment: TextAlignment::Center,
-                            ..default()
-                        },
-                        ..default()
-                    });
+                    TextColor(Color::WHITE),
+                ));
+                parent.spawn(ImageNode {
+                    image: asset_server.load("sprites/ball_blue_large.png"),
+                    ..default()
                 });
-        })
-        // Quit button
-        .with_children(|parent| {
+            });
+            // Play button
             parent
                 .spawn((
-                    ButtonBundle {
-                        style: NORMAL_BUTTON_STYLE,
-                        background_color: NORMAL_BUTTON_COLOR.into(),
+                    NORMAL_BUTTON_NODE,
+                    Button,
+                    PlayButton,
+                    BorderRadius::all(Val::Px(10.0)),
+                ))
+                .with_child((
+                    Text::new("Play (G)"),
+                    TextFont {
+                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                        font_size: 32.0,
                         ..default()
                     },
-                    QuitButton {},
-                ))
-                .with_children(|parent| {
-                    parent.spawn(TextBundle {
-                        text: Text {
-                            sections: vec![TextSection::new(
-                                "Quit",
-                                get_text_style(32.0, asset_server),
-                            )],
-                            alignment: TextAlignment::Center,
-                            ..default()
-                        },
+                    TextColor(Color::WHITE),
+                    TextLayout {
+                        justify: JustifyText::Center,
                         ..default()
-                    });
-                });
+                    },
+                ));
+            // Quit button
+            parent
+                .spawn((
+                    NORMAL_BUTTON_NODE,
+                    Button,
+                    QuitButton,
+                    BorderRadius::all(Val::Px(10.0)),
+                ))
+                .with_child((
+                    Text::new("Quit"),
+                    TextFont {
+                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                        font_size: 32.0,
+                        ..default()
+                    },
+                    TextColor(Color::WHITE),
+                    TextLayout {
+                        justify: JustifyText::Center,
+                        ..default()
+                    },
+                ));
         })
         .id()
 }

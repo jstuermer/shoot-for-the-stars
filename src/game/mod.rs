@@ -21,7 +21,7 @@ pub struct GamePlugin;
 
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
-        app.add_state::<SimulationState>()
+        app.init_state::<SimulationState>()
             .add_event::<GameOver>()
             .add_plugins((
                 EnemyPlugin,

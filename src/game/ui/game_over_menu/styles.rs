@@ -1,26 +1,18 @@
 use bevy::prelude::*;
 
-pub const GAME_OVER_MENU_STYLE: Style = {
-    let mut style = Style::DEFAULT;
-    style.width = Val::Percent(100.0);
-    style.height = Val::Percent(100.0);
-    style.flex_direction = FlexDirection::Column;
-    style.justify_content = JustifyContent::Center;
-    style
+pub const GAME_OVER_MENU_NODE: Node = {
+    let mut node = Node::DEFAULT;
+    node.width = Val::Percent(100.0);
+    node.height = Val::Percent(100.0);
+    node.flex_direction = FlexDirection::Column;
+    node.justify_content = JustifyContent::Center;
+    node.align_items = AlignItems::Center;
+    node
 };
 
-pub const INFO_ITEM_STYLE: Style = {
-    let mut style = Style::DEFAULT;
-    style.column_gap = Val::Px(20.0);
-    style.flex_direction = FlexDirection::Row;
-    style.align_self = AlignSelf::Center;
-    style
+pub const INFO_ITEM_NODE: Node = {
+    let mut node = Node::DEFAULT;
+    node.column_gap = Val::Px(20.0);
+    node.flex_direction = FlexDirection::Row;
+    node
 };
-
-pub fn get_text_style(font_size: f32, asset_server: &Res<AssetServer>) -> TextStyle {
-    TextStyle {
-        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-        font_size,
-        color: Color::WHITE,
-    }
-}
