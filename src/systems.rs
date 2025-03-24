@@ -44,3 +44,12 @@ pub fn transition_to_main_menu_state(
         println!("App in MainMenu state.");
     }
 }
+
+pub fn quit_game(
+    mut app_exit_event_writer: EventWriter<AppExit>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+) {
+    if keyboard_input.just_pressed(KeyCode::KeyQ) {
+        app_exit_event_writer.send(AppExit::Success);
+    }
+}

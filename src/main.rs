@@ -18,7 +18,11 @@ fn main() {
         .add_systems(Startup, spawn_camera)
         .add_systems(
             Update,
-            (transition_to_game_state, transition_to_main_menu_state),
+            (
+                transition_to_game_state,
+                transition_to_main_menu_state,
+                quit_game,
+            ),
         )
         .run();
 }
