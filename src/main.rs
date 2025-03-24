@@ -21,7 +21,7 @@ fn main() {
             (
                 transition_to_game_state,
                 transition_to_main_menu_state,
-                quit_game,
+                quit_game.run_if(in_state(AppState::MainMenu)),
             ),
         )
         .run();
