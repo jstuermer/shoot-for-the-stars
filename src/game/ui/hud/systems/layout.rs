@@ -45,7 +45,7 @@ fn build_hud(commands: &mut Commands, asset_server: &Res<AssetServer>) -> Entity
                                 ..default()
                             },
                             TextColor(Color::WHITE),
-                            ScoreInfo {},
+                            ScoreInfo,
                         ));
                     });
                     // Player health info in the center
@@ -70,7 +70,7 @@ fn build_hud(commands: &mut Commands, asset_server: &Res<AssetServer>) -> Entity
                                 ..default()
                             },
                             TextColor(Color::WHITE),
-                            HealthInfo {},
+                            HealthInfo,
                         ));
                     });
                     // Number of enemies info at the bottom
@@ -95,7 +95,7 @@ fn build_hud(commands: &mut Commands, asset_server: &Res<AssetServer>) -> Entity
                                 ..default()
                             },
                             TextColor(Color::WHITE),
-                            EnemyNumberInfo {},
+                            EnemyNumberInfo,
                         ));
                     });
                 })

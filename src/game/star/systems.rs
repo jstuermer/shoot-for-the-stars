@@ -22,7 +22,7 @@ pub fn spawn_stars(
         commands.spawn((
             Sprite::from_image(asset_server.load("sprites/star.png")),
             Transform::from_xyz(x_position, y_position, 0.0),
-            Star {},
+            Star,
         ));
     }
 }
@@ -51,7 +51,7 @@ pub fn spawn_stars_over_time(
     commands.spawn((
         Sprite::from_image(asset_server.load("sprites/star.png")),
         Transform::from_xyz(x_position, y_position, 0.0),
-        Star {},
+        Star,
     ));
 }
 

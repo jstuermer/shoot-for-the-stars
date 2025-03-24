@@ -21,7 +21,7 @@ fn build_game_over_menu(
     final_score: u32,
 ) -> Entity {
     commands
-        .spawn((GAME_OVER_MENU_NODE, GameOverMenu {}))
+        .spawn((GAME_OVER_MENU_NODE, GameOverMenu))
         .with_children(|parent| {
             parent.spawn(INFO_ITEM_NODE).with_children(|parent| {
                 parent.spawn((
@@ -44,7 +44,7 @@ fn build_game_over_menu(
                         ..default()
                     },
                     TextColor(Color::WHITE),
-                    FinalScoreInfo {},
+                    FinalScoreInfo,
                 ));
             });
         })

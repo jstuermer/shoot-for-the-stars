@@ -24,7 +24,7 @@ pub fn spawn_player(
     commands.spawn((
         Sprite::from_image(asset_server.load("sprites/ball_blue_large.png")),
         Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 0.0),
-        Player {},
+        Player,
         Health {
             current: PLAYER_START_HEALTH,
         },
