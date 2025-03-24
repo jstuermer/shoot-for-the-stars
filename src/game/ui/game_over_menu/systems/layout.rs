@@ -15,6 +15,12 @@ pub fn spawn_game_over_menu(
         build_game_over_menu(&mut commands, &asset_server, final_score);
 }
 
+pub fn despawn_game_over_menu(mut commands: Commands, query: Query<Entity, With<GameOverMenu>>) {
+    if let Ok(game_over_menu_entity) = query.get_single() {
+        commands.entity(game_over_menu_entity).despawn_recursive();
+    }
+}
+
 fn build_game_over_menu(
     commands: &mut Commands,
     asset_server: &Res<AssetServer>,
