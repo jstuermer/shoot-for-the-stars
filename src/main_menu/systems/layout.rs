@@ -48,7 +48,7 @@ pub fn build_main_menu(commands: &mut Commands, asset_server: &Res<AssetServer>)
                     BorderRadius::all(Val::Px(10.0)),
                 ))
                 .with_child((
-                    Text::new("Play (G)"),
+                    Text::new("Play (P)"),
                     TextFont {
                         font: asset_server.load("fonts/FiraSans-Bold.ttf"),
                         font_size: 32.0,

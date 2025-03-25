@@ -3,10 +3,12 @@ mod styles;
 mod systems;
 
 use bevy::prelude::*;
+use systems::{
+    interactions::{interact_with_play_button, interact_with_quit_button},
+    layout::{despawn_main_menu, spawn_main_menu},
+};
 
 use crate::AppState;
-use systems::interactions::*;
-use systems::layout::*;
 
 pub struct MainMenuPlugin;
 
