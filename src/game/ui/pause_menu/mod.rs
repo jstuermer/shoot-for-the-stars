@@ -32,7 +32,7 @@ impl Plugin for PauseMenuPlugin {
                 continue_game,
                 reset_game,
                 restart_game.after(reset_game),
-                run_state_transitions, // make sure that restarting makes other entities despawn
+                run_state_transitions.after(reset_game), // make sure that restarting makes other entities despawn
             )
                 .run_if(in_state(AppState::Game))
                 .run_if(in_state(SimulationState::Paused)),

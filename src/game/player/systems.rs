@@ -8,6 +8,7 @@ use crate::game::enemy::ENEMY_SIZE;
 use crate::game::score::resources::Score;
 use crate::game::star::components::Star;
 use crate::game::star::STAR_SIZE;
+use crate::game::SimulationState;
 use crate::{utils, AppState};
 
 pub const PLAYER_SIZE: f32 = 64.0; // this is the size of the player sprite
@@ -170,12 +171,13 @@ pub fn handle_game_over(
     mut game_over_event_reader: EventReader<GameOver>,
     player_query: Query<Entity, With<Player>>,
     mut next_app_state: ResMut<NextState<AppState>>,
+    mut next_simulation_state: ResMut<NextState<SimulationState>>,
 ) {
-    for event in &mut game_over_event_reader.read() {
+    for _event in &mut game_over_event_reader.read() {
         if let Ok(player_entity) = player_query.get_single() {
             commands.entity(player_entity).despawn();
             next_app_state.set(AppState::GameOver);
-            println!("You died! Your final score is: {}", event.score);
+            next_simulation_state.set(SimulationState::Paused);
         }
     }
 }

@@ -29,6 +29,17 @@ fn build_game_over_menu(
     commands
         .spawn((GAME_OVER_MENU_NODE, GameOverMenu))
         .with_children(|parent| {
+            // Game over menu title
+            parent.spawn(TITLE_NODE).with_child((
+                Text::new("Game Over!"),
+                TextFont {
+                    font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                    font_size: 64.0,
+                    ..default()
+                },
+                TextColor(Color::WHITE),
+            ));
+            // Final score info
             parent.spawn(INFO_ITEM_NODE).with_children(|parent| {
                 parent.spawn((
                     ImageNode {
@@ -37,8 +48,8 @@ fn build_game_over_menu(
                     },
                     Node {
                         top: Val::Px(10.0),
-                        width: Val::Px(40.0),
-                        height: Val::Px(40.0),
+                        width: Val::Px(35.0),
+                        height: Val::Px(35.0),
                         ..default()
                     },
                 ));
@@ -46,13 +57,55 @@ fn build_game_over_menu(
                     Text::new(format! {"Final score: {:?}", final_score}),
                     TextFont {
                         font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                        font_size: 54.0,
+                        font_size: 44.0,
                         ..default()
                     },
                     TextColor(Color::WHITE),
                     FinalScoreInfo,
                 ));
             });
+            // Restart button
+            parent
+                .spawn((
+                    NORMAL_BUTTON_NODE,
+                    Button,
+                    GameOverRestartButton,
+                    BorderRadius::all(Val::Px(10.0)),
+                ))
+                .with_child((
+                    Text::new("Restart (R)"),
+                    TextFont {
+                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                        font_size: 32.0,
+                        ..default()
+                    },
+                    TextColor(Color::WHITE),
+                    TextLayout {
+                        justify: JustifyText::Center,
+                        ..default()
+                    },
+                ));
+            // Main menu button
+            parent
+                .spawn((
+                    NORMAL_BUTTON_NODE,
+                    Button,
+                    GameOverMainMenuButton,
+                    BorderRadius::all(Val::Px(10.0)),
+                ))
+                .with_child((
+                    Text::new("Main Menu (M)"),
+                    TextFont {
+                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                        font_size: 32.0,
+                        ..default()
+                    },
+                    TextColor(Color::WHITE),
+                    TextLayout {
+                        justify: JustifyText::Center,
+                        ..default()
+                    },
+                ));
         })
         .id()
 }
