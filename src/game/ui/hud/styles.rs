@@ -1,6 +1,13 @@
 use crate::Srgba;
 use bevy::prelude::*;
 
+pub const CONTROLS_INFO_COLORS: Srgba = Srgba {
+    red: 1.0,
+    green: 1.0,
+    blue: 1.0,
+    alpha: 0.5,
+};
+
 pub const INFO_BAR_COLOR: Srgba = Srgba {
     red: 0.25,
     green: 0.25,
@@ -8,7 +15,7 @@ pub const INFO_BAR_COLOR: Srgba = Srgba {
     alpha: 0.7,
 }; // Color::DARK_GRAY with smaller alpha
 
-pub const HUD_NODE: Node = {
+pub const INFO_HUD_NODE: Node = {
     let mut node = Node::DEFAULT;
     node.width = Val::Percent(100.0);
     node.height = Val::Percent(100.0);

@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 #[derive(Component)]
-pub struct GameHUD;
+pub struct GameInfoHUD;
 
 #[derive(Component)]
 pub struct ScoreInfo;
@@ -11,3 +11,6 @@ pub struct HealthInfo;
 
 #[derive(Component)]
 pub struct EnemyNumberInfo;
+
+#[derive(Component)]
+pub struct ControlsHUD;

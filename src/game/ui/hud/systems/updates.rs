@@ -7,7 +7,7 @@ use crate::game::{
     enemy::components::Enemy,
     player::components::Player,
     score::resources::Score,
-    ui::hud::components::{EnemyNumberInfo, GameHUD, HealthInfo, ScoreInfo},
+    ui::hud::components::{ControlsHUD, EnemyNumberInfo, GameInfoHUD, HealthInfo, ScoreInfo},
 };
 
 pub fn update_score_info(
@@ -45,8 +45,15 @@ pub fn update_enemy_number_info(
     }
 }
 
-pub fn despawn_game_hud(mut commands: Commands, query: Query<Entity, With<GameHUD>>) {
-    if let Ok(game_hud_entity) = query.get_single() {
-        commands.entity(game_hud_entity).despawn_recursive();
+pub fn despawn_game_hud(
+    mut commands: Commands,
+    game_info_query: Query<Entity, With<GameInfoHUD>>,
+    controls_query: Query<Entity, With<ControlsHUD>>,
+) {
+    if let Ok(game_info_entity) = game_info_query.get_single() {
+        commands.entity(game_info_entity).despawn_recursive();
+    }
+    if let Ok(controls_entity) = controls_query.get_single() {
+        commands.entity(controls_entity).despawn_recursive();
     }
 }

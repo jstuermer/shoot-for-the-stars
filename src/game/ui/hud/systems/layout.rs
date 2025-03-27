@@ -8,12 +8,13 @@ use crate::game::{
 };
 
 pub fn spawn_game_hud(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let _hud_entity: Entity = build_hud(&mut commands, &asset_server);
+    let _hud_entity: Entity = build_info_hud(&mut commands, &asset_server);
+    let _controls_entity: Entity = build_controls_hud(&mut commands, &asset_server);
 }
 
-fn build_hud(commands: &mut Commands, asset_server: &Res<AssetServer>) -> Entity {
+fn build_info_hud(commands: &mut Commands, asset_server: &Res<AssetServer>) -> Entity {
     commands
-        .spawn((HUD_NODE, GameHUD))
+        .spawn((INFO_HUD_NODE, GameInfoHUD))
         // Info bar at the top-left of the screen
         .with_children(|parent| {
             parent
@@ -100,6 +101,77 @@ fn build_hud(commands: &mut Commands, asset_server: &Res<AssetServer>) -> Entity
                     });
                 })
                 .with_child((INFO_BAR_NODE, BackgroundColor(INFO_BAR_COLOR.into())));
+        })
+        .id()
+}
+
+fn build_controls_hud(commands: &mut Commands, asset_server: &Res<AssetServer>) -> Entity {
+    commands
+        .spawn((
+            Node {
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                flex_direction: FlexDirection::Column,
+                justify_content: JustifyContent::End,
+                ..default()
+            },
+            ControlsHUD,
+        ))
+        .with_children(|parent| {
+            parent
+                .spawn(Node {
+                    flex_direction: FlexDirection::Row,
+                    justify_content: JustifyContent::Center,
+                    column_gap: Val::Px(20.0),
+                    ..default()
+                })
+                .with_children(|parent| {
+                    parent.spawn((
+                        Text::new("W: Move up"),
+                        TextFont {
+                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                            font_size: 22.0,
+                            ..default()
+                        },
+                        TextColor(CONTROLS_INFO_COLORS.into()),
+                    ));
+                    parent.spawn((
+                        Text::new("A: Move left"),
+                        TextFont {
+                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                            font_size: 22.0,
+                            ..default()
+                        },
+                        TextColor(CONTROLS_INFO_COLORS.into()),
+                    ));
+                    parent.spawn((
+                        Text::new("S: Move down"),
+                        TextFont {
+                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                            font_size: 22.0,
+                            ..default()
+                        },
+                        TextColor(CONTROLS_INFO_COLORS.into()),
+                    ));
+                    parent.spawn((
+                        Text::new("D: Move right"),
+                        TextFont {
+                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                            font_size: 22.0,
+                            ..default()
+                        },
+                        TextColor(CONTROLS_INFO_COLORS.into()),
+                    ));
+                    parent.spawn((
+                        Text::new("Space: Pause"),
+                        TextFont {
+                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                            font_size: 22.0,
+                            ..default()
+                        },
+                        TextColor(CONTROLS_INFO_COLORS.into()),
+                    ));
+                });
         })
         .id()
 }
