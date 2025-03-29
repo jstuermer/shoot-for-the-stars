@@ -44,26 +44,29 @@ pub fn player_movement(
     keyboard_input: Res<ButtonInput<KeyCode>>,
     time: Res<Time>,
 ) {
-    if let Ok(mut player_transform) = player_query.get_single_mut() {
-        let mut direction = Vec3::ZERO;
+    let mut player_transform = player_query.single_mut();
+    let mut direction: Vec2 = Vec2::ZERO;
 
-        if keyboard_input.pressed(KeyCode::ArrowLeft) || keyboard_input.pressed(KeyCode::KeyA) {
-            direction += Vec3::new(-1.0, 0.0, 0.0)
-        }
-        if keyboard_input.pressed(KeyCode::ArrowRight) || keyboard_input.pressed(KeyCode::KeyD) {
-            direction += Vec3::new(1.0, 0.0, 0.0)
-        }
-        if keyboard_input.pressed(KeyCode::ArrowDown) || keyboard_input.pressed(KeyCode::KeyS) {
-            direction += Vec3::new(0.0, -1.0, 0.0)
-        }
-        if keyboard_input.pressed(KeyCode::ArrowUp) || keyboard_input.pressed(KeyCode::KeyW) {
-            direction += Vec3::new(0.0, 1.0, 0.0)
-        }
-
-        direction = direction.normalize_or_zero();
-
-        player_transform.translation += direction * PLAYER_SPEED * time.delta_secs();
+    if keyboard_input.pressed(KeyCode::KeyA) {
+        direction.x = -1.0;
     }
+    if keyboard_input.pressed(KeyCode::KeyD) {
+        direction.x = 1.0;
+    }
+    if keyboard_input.pressed(KeyCode::KeyS) {
+        direction.y = -1.0;
+    }
+    if keyboard_input.pressed(KeyCode::KeyW) {
+        direction.y = 1.0;
+    }
+
+    if direction != Vec2::ZERO {
+        direction = direction.normalize();
+        player_transform.rotation = Quat::from_rotation_arc_2d(Vec2::Y, direction);
+    }
+
+    player_transform.translation += direction.extend(0.0) * PLAYER_SPEED * time.delta_secs();
+    // }
 }
 
 pub fn confine_player_movement(
