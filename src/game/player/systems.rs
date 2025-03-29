@@ -1,6 +1,7 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
-use super::{components::*, PLAYER_START_HEALTH};
+use super::components::Player;
+use super::{INITIAL_PLAYER_HEALTH, PLAYER_SPRITE};
 use crate::events::GameOver;
 use crate::game::components::Health;
 use crate::game::enemy::components::Enemy;
@@ -23,11 +24,11 @@ pub fn spawn_player(
     let window: &Window = window_query.get_single().unwrap();
 
     commands.spawn((
-        Sprite::from_image(asset_server.load("sprites/ball_blue_large.png")),
+        Sprite::from_image(asset_server.load(PLAYER_SPRITE)),
         Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 0.0),
         Player,
         Health {
-            current: PLAYER_START_HEALTH,
+            current: INITIAL_PLAYER_HEALTH,
         },
     ));
 }

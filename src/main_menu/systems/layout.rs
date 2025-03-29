@@ -1,8 +1,11 @@
 use bevy::prelude::*;
 
-use crate::main_menu::{
-    components::{MainMenu, PlayButton, QuitButton},
-    styles::*,
+use crate::{
+    game::player::PLAYER_SPRITE,
+    main_menu::{
+        components::{MainMenu, PlayButton, QuitButton},
+        styles::*,
+    },
 };
 
 pub fn spawn_main_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
@@ -22,11 +25,11 @@ pub fn build_main_menu(commands: &mut Commands, asset_server: &Res<AssetServer>)
             // Title
             parent.spawn(TITLE_NODE).with_children(|parent| {
                 parent.spawn(ImageNode {
-                    image: asset_server.load("sprites/ball_blue_large.png"),
+                    image: asset_server.load(PLAYER_SPRITE),
                     ..default()
                 });
                 parent.spawn((
-                    Text::new("Bevy Ball Game"),
+                    Text::new("Shoot For The Stars"),
                     TextFont {
                         font: asset_server.load("fonts/FiraSans-Bold.ttf"),
                         font_size: 64.0,
@@ -35,7 +38,7 @@ pub fn build_main_menu(commands: &mut Commands, asset_server: &Res<AssetServer>)
                     TextColor(Color::WHITE),
                 ));
                 parent.spawn(ImageNode {
-                    image: asset_server.load("sprites/ball_blue_large.png"),
+                    image: asset_server.load(PLAYER_SPRITE),
                     ..default()
                 });
             });

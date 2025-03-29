@@ -8,7 +8,8 @@ use systems::*;
 use super::SimulationState;
 use crate::AppState;
 
-pub const PLAYER_START_HEALTH: u32 = 3;
+pub const INITIAL_PLAYER_HEALTH: u32 = 3;
+pub const PLAYER_SPRITE: &str = "sprites/spacecraft.png";
 
 pub struct PlayerPlugin;
 

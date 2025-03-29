@@ -2,10 +2,26 @@ use bevy::{prelude::*, window::PrimaryWindow};
 use rand::seq::SliceRandom;
 use rand::Rng;
 
-use super::components::*;
-use super::resources::*;
-use super::{ENEMY_SIZE, ENEMY_SPEED, NUMBER_OF_ENEMIES};
+use super::components::Enemy;
+use super::resources::EnemySpawnTimer;
+use super::ENEMY_SPRITE;
+use super::{ENEMY_SIZE, ENEMY_SPEED, INITIAL_NUMBER_OF_ENEMIES};
 use crate::utils;
+
+fn create_enemy_bundle(
+    asset_server: &Res<AssetServer>,
+    x_position: f32,
+    y_position: f32,
+) -> impl Bundle {
+    (
+        // TODO: Check whether asteroid size fits the collision size of the enemies
+        Sprite::from_image(asset_server.load(ENEMY_SPRITE)),
+        Transform::from_xyz(x_position, y_position, 0.0),
+        Enemy {
+            direction: Vec3::ZERO,
+        },
+    )
+}
 
 pub fn spawn_enemies(
     mut commands: Commands,
@@ -13,20 +29,15 @@ pub fn spawn_enemies(
     asset_server: Res<AssetServer>,
 ) {
     let window: &Window = window_query.get_single().unwrap();
+    println!("{}", window.resolution.scale_factor());
     let [x_min, x_max, y_min, y_max] = utils::get_confinement(window, ENEMY_SIZE);
     let mut rng: rand::rngs::ThreadRng = rand::thread_rng();
 
-    for _ in 0..NUMBER_OF_ENEMIES {
+    for _ in 0..INITIAL_NUMBER_OF_ENEMIES {
         let x_position: f32 = rng.gen_range(x_min..=x_max);
         let y_position: f32 = rng.gen_range(y_min..=y_max);
 
-        commands.spawn((
-            Sprite::from_image(asset_server.load("sprites/ball_red_large.png")),
-            Transform::from_xyz(x_position, y_position, 0.0),
-            Enemy {
-                direction: Vec3::ZERO,
-            },
-        ));
+        commands.spawn(create_enemy_bundle(&asset_server, x_position, y_position));
     }
 }
 
@@ -120,11 +131,5 @@ pub fn spawn_enemies_over_time(
     let x_position: f32 = rng.gen_range(x_min..=x_max);
     let y_position: f32 = rng.gen_range(y_min..=y_max);
 
-    commands.spawn((
-        Sprite::from_image(asset_server.load("sprites/ball_red_large.png")),
-        Transform::from_xyz(x_position, y_position, 0.0),
-        Enemy {
-            direction: Vec3::ZERO,
-        },
-    ));
+    commands.spawn(create_enemy_bundle(&asset_server, x_position, y_position));
 }

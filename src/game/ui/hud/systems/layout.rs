@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 
 use crate::game::{
-    enemy::NUMBER_OF_ENEMIES,
-    player::PLAYER_START_HEALTH,
+    enemy::{ENEMY_SPRITE, INITIAL_NUMBER_OF_ENEMIES},
+    player::INITIAL_PLAYER_HEALTH,
     score::resources::Score,
     ui::hud::{components::*, styles::*},
 };
@@ -64,7 +64,7 @@ fn build_info_hud(commands: &mut Commands, asset_server: &Res<AssetServer>) -> E
                             },
                         ));
                         parent.spawn((
-                            Text::new(format!("{:?}", PLAYER_START_HEALTH)),
+                            Text::new(format!("{:?}", INITIAL_PLAYER_HEALTH)),
                             TextFont {
                                 font: asset_server.load("fonts/FiraSans-Bold.ttf"),
                                 font_size: 32.0,
@@ -78,7 +78,7 @@ fn build_info_hud(commands: &mut Commands, asset_server: &Res<AssetServer>) -> E
                     parent.spawn(INFO_ITEM_NODE).with_children(|parent| {
                         parent.spawn((
                             ImageNode {
-                                image: asset_server.load("sprites/ball_red_large.png"),
+                                image: asset_server.load(ENEMY_SPRITE),
                                 ..default()
                             },
                             Node {
@@ -89,7 +89,7 @@ fn build_info_hud(commands: &mut Commands, asset_server: &Res<AssetServer>) -> E
                             },
                         ));
                         parent.spawn((
-                            Text::new(format!("{:?}", NUMBER_OF_ENEMIES)),
+                            Text::new(format!("{:?}", INITIAL_NUMBER_OF_ENEMIES)),
                             TextFont {
                                 font: asset_server.load("fonts/FiraSans-Bold.ttf"),
                                 font_size: 32.0,

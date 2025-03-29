@@ -1,6 +1,6 @@
 mod components;
 mod enemy;
-mod player;
+pub mod player;
 mod score;
 mod star;
 mod systems;

@@ -22,7 +22,7 @@ pub const NORMAL_BUTTON_NODE: Node = {
 
 pub const TITLE_NODE: Node = {
     let mut node = Node::DEFAULT;
-    node.width = Val::Px(700.0);
+    node.width = Val::Percent(100.0);
     node.height = Val::Px(150.0);
     node.flex_direction = FlexDirection::Row;
     node.align_items = AlignItems::Center;

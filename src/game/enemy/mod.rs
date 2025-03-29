@@ -10,10 +10,12 @@ use systems::*;
 use super::SimulationState;
 use crate::AppState;
 
-pub const ENEMY_SIZE: f32 = 64.0; // this is the size of the enemy sprite
-pub const NUMBER_OF_ENEMIES: usize = 4;
+/// Size of the enemy sprite in pixels.
+pub const ENEMY_SIZE: f32 = 64.0;
+pub const INITIAL_NUMBER_OF_ENEMIES: usize = 4;
 const ENEMY_SPEED: f32 = 200.0;
 const ENEMY_TIMESTEP: f64 = 1.0;
+pub const ENEMY_SPRITE: &str = "sprites/asteroid.png";
 
 pub struct EnemyPlugin;
 
