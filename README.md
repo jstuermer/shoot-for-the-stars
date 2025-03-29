@@ -1,4 +1,3 @@
-# Bevy Ball Game
+# Shoot For The Stars
 
-A game based on the [Bevy tutorial by Jacques](https://www.youtube.com/watch?v=TQt-v_bFdao&list=PLVnntJRoP85JHGX7rGDu6LaF3fmDDbqyd&pp=iAQB)
-with several custom adjustments and extensions.
+A little game in which the player controls a spacecraft and increases a score by collecting stars. While doing so the player has to avoid collisions with asteroids. The latter spawn over time increasing the difficulty.
