@@ -3,7 +3,7 @@ use bevy::{prelude::*, window::PrimaryWindow};
 use super::components::Player;
 use super::{INITIAL_PLAYER_HEALTH, PLAYER_SPRITE};
 use crate::events::GameOver;
-use crate::game::components::Health;
+use crate::game::components::{Health, Velocity};
 use crate::game::enemy::components::Enemy;
 use crate::game::enemy::ENEMY_SIZE;
 use crate::game::score::resources::Score;
@@ -12,8 +12,9 @@ use crate::game::star::STAR_SIZE;
 use crate::game::SimulationState;
 use crate::{utils, AppState};
 
-pub const PLAYER_SIZE: f32 = 64.0; // this is the size of the player sprite
-pub const PLAYER_SPEED: f32 = 500.0;
+// Size of the player sprite in pixels.
+pub const PLAYER_SIZE: f32 = 64.0;
+pub const PLAYER_SPEED: f32 = 10.0;
 pub const COLLISION_REBOUND_STRENGTH: f32 = 50.0;
 
 pub fn spawn_player(
@@ -30,6 +31,9 @@ pub fn spawn_player(
         Health {
             current: INITIAL_PLAYER_HEALTH,
         },
+        Velocity {
+            current: Vec3::ZERO,
+        },
     ));
 }
 
@@ -40,11 +44,11 @@ pub fn despawn_player(mut commands: Commands, player_query: Query<Entity, With<P
 }
 
 pub fn player_movement(
-    mut player_query: Query<&mut Transform, With<Player>>,
+    mut player_query: Query<(&mut Transform, &mut Velocity), With<Player>>,
     keyboard_input: Res<ButtonInput<KeyCode>>,
-    time: Res<Time>,
+    // time: Res<Time>,
 ) {
-    let mut player_transform = player_query.single_mut();
+    let (mut player_transform, mut player_velocity) = player_query.single_mut();
     let mut direction: Vec2 = Vec2::ZERO;
 
     if keyboard_input.pressed(KeyCode::KeyA) {
@@ -65,8 +69,8 @@ pub fn player_movement(
         player_transform.rotation = Quat::from_rotation_arc_2d(Vec2::Y, direction);
     }
 
-    player_transform.translation += direction.extend(0.0) * PLAYER_SPEED * time.delta_secs();
-    // }
+    player_velocity.current = direction.extend(0.0) * PLAYER_SPEED;
+    // player_transform.translation += direction.extend(0.0) * PLAYER_SPEED * time.delta_secs();
 }
 
 pub fn confine_player_movement(
@@ -147,6 +151,7 @@ pub fn player_hit_enemy(
                 PlaybackSettings::DESPAWN,
             ));
 
+            // TODO: Rewrite movement and collisions using velocity-based physics.
             relative_vector_in_plane = relative_vector_in_plane.normalize_or_zero();
             enemy_transform.translation -= COLLISION_REBOUND_STRENGTH * relative_vector_in_plane;
             player_transform.translation += COLLISION_REBOUND_STRENGTH * relative_vector_in_plane;

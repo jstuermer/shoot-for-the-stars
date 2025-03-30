@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use super::SimulationState;
+use super::{components::Velocity, SimulationState};
 
 pub fn toggle_simulation(
     mut next_simulation_state: ResMut<NextState<SimulationState>>,
@@ -15,5 +15,11 @@ pub fn toggle_simulation(
             next_simulation_state.set(SimulationState::Running);
             println!("Simulation is running.");
         }
+    }
+}
+
+pub fn step_physics(mut query: Query<(&mut Transform, &Velocity)>, time: Res<Time<Fixed>>) {
+    for (mut transform, velocity) in query.iter_mut() {
+        transform.translation += velocity.current * time.delta_secs();
     }
 }

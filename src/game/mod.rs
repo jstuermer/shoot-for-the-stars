@@ -12,6 +12,7 @@ use score::ScorePlugin;
 use star::StarPlugin;
 
 use bevy::prelude::*;
+use systems::step_physics;
 
 use crate::{events::GameOver, AppState};
 
@@ -30,7 +31,13 @@ impl Plugin for GamePlugin {
                 StarPlugin,
                 GameUIPlugin,
             ))
-            .add_systems(Update, toggle_simulation.run_if(in_state(AppState::Game)));
+            .add_systems(
+                Update,
+                (
+                    step_physics,
+                    toggle_simulation.run_if(in_state(AppState::Game)),
+                ),
+            );
     }
 }
 
