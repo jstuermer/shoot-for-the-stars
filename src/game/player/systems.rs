@@ -46,7 +46,6 @@ pub fn despawn_player(mut commands: Commands, player_query: Query<Entity, With<P
 pub fn player_movement(
     mut player_query: Query<(&mut Transform, &mut Velocity), With<Player>>,
     keyboard_input: Res<ButtonInput<KeyCode>>,
-    // time: Res<Time>,
 ) {
     let (mut player_transform, mut player_velocity) = player_query.single_mut();
     let mut direction: Vec2 = Vec2::ZERO;
@@ -70,7 +69,6 @@ pub fn player_movement(
     }
 
     player_velocity.current = direction.extend(0.0) * PLAYER_SPEED;
-    // player_transform.translation += direction.extend(0.0) * PLAYER_SPEED * time.delta_secs();
 }
 
 pub fn confine_player_movement(
