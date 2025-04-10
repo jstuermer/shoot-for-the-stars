@@ -19,7 +19,6 @@ pub fn transition_to_game_state(
     if keyboard_input.just_pressed(KeyCode::KeyP) {
         next_app_state.set(AppState::Game);
         next_simulation_state.set(SimulationState::Running);
-        println!("App in Game state.");
     }
 }
 

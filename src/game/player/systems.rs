@@ -151,7 +151,6 @@ pub fn player_hit_enemy(
             player_transform.translation += COLLISION_REBOUND_STRENGTH * relative_vector_in_plane;
 
             player_health.current -= 1;
-            println!("You lost a health point ({} left)!", player_health.current)
         }
     }
 }
