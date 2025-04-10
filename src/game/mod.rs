@@ -34,8 +34,9 @@ impl Plugin for GamePlugin {
             .add_systems(
                 Update,
                 (
-                    apply_velocities,
-                    enforce_spatial_confinement,
+                    (apply_velocities, enforce_spatial_confinement)
+                        .run_if(in_state(AppState::Game))
+                        .run_if(in_state(SimulationState::Running)),
                     toggle_simulation.run_if(in_state(AppState::Game)),
                 ),
             );
