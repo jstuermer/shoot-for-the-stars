@@ -12,8 +12,10 @@ use crate::AppState;
 
 /// Size of the enemy sprite in pixels.
 pub const ENEMY_SIZE: f32 = 64.0;
+/// Number of enemies to spawn at the start of the game.
 pub const INITIAL_NUMBER_OF_ENEMIES: usize = 4;
-const ENEMY_SPEED: f32 = 200.0;
+/// Speed of enemies in pixels per second.
+const ENEMY_SPEED: f32 = 5.0;
 const ENEMY_TIMESTEP: f64 = 1.0;
 pub const ENEMY_SPRITE: &str = "sprites/asteroid.png";
 
@@ -25,20 +27,12 @@ impl Plugin for EnemyPlugin {
             .insert_resource(Time::from_seconds(ENEMY_TIMESTEP))
             .add_systems(OnEnter(AppState::Game), spawn_enemies)
             .add_systems(
-                Update,
+                FixedUpdate,
                 (
-                    enemy_movement,
-                    confine_enemy_movement.after(enemy_movement),
+                    redirect_enemies,
                     tick_enemy_spawn_timer,
                     spawn_enemies_over_time,
                 )
-                    .run_if(in_state(AppState::Game))
-                    .run_if(in_state(SimulationState::Running)),
-            )
-            .add_systems(
-                FixedUpdate,
-                enemy_redirection
-                    .before(confine_enemy_movement)
                     .run_if(in_state(AppState::Game))
                     .run_if(in_state(SimulationState::Running)),
             )

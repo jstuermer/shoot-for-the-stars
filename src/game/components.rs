@@ -8,7 +8,14 @@ pub struct Health {
 }
 
 /// Velocity vector that makes an entity move.
-#[derive(Component, Clone, Copy, Debug, Default, PartialEq)]
+#[derive(Component, Debug, Default)]
 pub struct Velocity {
     pub current: Vec3,
+}
+
+/// Size of an entity that is to be considered for collisions.
+#[derive(Component, Debug)]
+pub struct Size {
+    pub width: f32,
+    pub height: f32,
 }

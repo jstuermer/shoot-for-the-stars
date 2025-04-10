@@ -1,9 +1,11 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 use rand::Rng;
 
-use super::components::*;
-use super::resources::*;
-use super::{NUMBER_OF_STARS, STAR_SIZE};
+use super::{
+    components::{star_size, Star},
+    resources::StarSpawnTimer,
+    NUMBER_OF_STARS,
+};
 use crate::utils;
 
 pub fn spawn_stars(
@@ -12,7 +14,8 @@ pub fn spawn_stars(
     asset_server: Res<AssetServer>,
 ) {
     let window: &Window = window_query.get_single().unwrap();
-    let [x_min, x_max, y_min, y_max] = utils::get_confinement(window, STAR_SIZE);
+    let size = star_size();
+    let [x_min, x_max, y_min, y_max] = utils::get_confinement(window, size.width, size.height);
     let mut rng: rand::rngs::ThreadRng = rand::thread_rng();
 
     for _ in 0..NUMBER_OF_STARS {
@@ -42,7 +45,8 @@ pub fn spawn_stars_over_time(
     }
 
     let window: &Window = window_query.get_single().unwrap();
-    let [x_min, x_max, y_min, y_max] = utils::get_confinement(window, STAR_SIZE);
+    let size = star_size();
+    let [x_min, x_max, y_min, y_max] = utils::get_confinement(window, size.width, size.height);
     let mut rng: rand::rngs::ThreadRng = rand::thread_rng();
 
     let x_position: f32 = rng.gen_range(x_min..=x_max);

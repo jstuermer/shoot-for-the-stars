@@ -1,6 +1,16 @@
 use bevy::prelude::*;
 
+use crate::game::components::{Size, Velocity};
+
+use super::ENEMY_SIZE;
+
 #[derive(Component)]
-pub struct Enemy {
-    pub direction: Vec3,
+#[require(Transform, Velocity, Size(enemy_size), Sprite)]
+pub struct Enemy;
+
+pub fn enemy_size() -> Size {
+    Size {
+        width: ENEMY_SIZE,
+        height: ENEMY_SIZE,
+    }
 }

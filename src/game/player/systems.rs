@@ -1,7 +1,7 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
-use super::components::Player;
-use super::{INITIAL_PLAYER_HEALTH, PLAYER_SPRITE};
+use super::components::{player_size, Player};
+use super::PLAYER_SPRITE;
 use crate::events::GameOver;
 use crate::game::components::{Health, Velocity};
 use crate::game::enemy::components::Enemy;
@@ -12,8 +12,9 @@ use crate::game::star::STAR_SIZE;
 use crate::game::SimulationState;
 use crate::{utils, AppState};
 
-// Size of the player sprite in pixels.
+/// Size of the player sprite in pixels.
 pub const PLAYER_SIZE: f32 = 64.0;
+/// Speed of the player in pixels per second.
 pub const PLAYER_SPEED: f32 = 10.0;
 pub const COLLISION_REBOUND_STRENGTH: f32 = 50.0;
 
@@ -28,12 +29,6 @@ pub fn spawn_player(
         Sprite::from_image(asset_server.load(PLAYER_SPRITE)),
         Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 0.0),
         Player,
-        Health {
-            current: INITIAL_PLAYER_HEALTH,
-        },
-        Velocity {
-            current: Vec3::ZERO,
-        },
     ));
 }
 
@@ -77,7 +72,8 @@ pub fn confine_player_movement(
 ) {
     if let Ok(mut player_transform) = player_query.get_single_mut() {
         let window: &Window = window_query.get_single().unwrap();
-        let [x_min, x_max, y_min, y_max] = utils::get_confinement(window, PLAYER_SIZE);
+        let size = player_size();
+        let [x_min, x_max, y_min, y_max] = utils::get_confinement(window, size.width, size.height);
 
         if player_transform.translation.x < x_min {
             player_transform.translation.x = x_min;
