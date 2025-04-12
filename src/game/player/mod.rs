@@ -19,6 +19,7 @@ impl Plugin for PlayerPlugin {
             .add_systems(
                 Update,
                 (
+                    animate_player_sprite,
                     player_movement,
                     confine_player_movement.after(player_movement),
                     player_hit_star,

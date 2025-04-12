@@ -1,9 +1,8 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
 use super::components::{player_size, Player};
-use super::PLAYER_SPRITE;
 use crate::events::GameOver;
-use crate::game::components::{Health, Velocity};
+use crate::game::components::{AnimationIndices, AnimationTimer, Health, Velocity};
 use crate::game::enemy::components::Enemy;
 use crate::game::enemy::ENEMY_SIZE;
 use crate::game::score::resources::Score;
@@ -21,12 +20,22 @@ pub const COLLISION_REBOUND_STRENGTH: f32 = 50.0;
 pub fn spawn_player(
     mut commands: Commands,
     window_query: Query<&Window, With<PrimaryWindow>>,
+    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
     asset_server: Res<AssetServer>,
 ) {
     let window: &Window = window_query.get_single().unwrap();
+    let texture = asset_server.load("sprites/spacecraft_sheet.png");
+    let layout = TextureAtlasLayout::from_grid(UVec2::splat(PLAYER_SIZE as u32), 3, 1, None, None);
+    let texture_atlas_layout = texture_atlas_layouts.add(layout);
 
     commands.spawn((
-        Sprite::from_image(asset_server.load(PLAYER_SPRITE)),
+        Sprite::from_atlas_image(
+            texture,
+            TextureAtlas {
+                layout: texture_atlas_layout,
+                index: 0,
+            },
+        ),
         Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 0.0),
         Player,
     ));
@@ -35,6 +44,25 @@ pub fn spawn_player(
 pub fn despawn_player(mut commands: Commands, player_query: Query<Entity, With<Player>>) {
     for player_entity in &player_query {
         commands.entity(player_entity).despawn();
+    }
+}
+
+pub fn animate_player_sprite(
+    time: Res<Time<Fixed>>,
+    mut query: Query<(&AnimationIndices, &mut AnimationTimer, &mut Sprite), With<Player>>,
+) {
+    for (indices, mut timer, mut sprite) in &mut query {
+        timer.tick(time.delta());
+
+        if timer.just_finished() {
+            if let Some(atlas) = &mut sprite.texture_atlas {
+                atlas.index = if atlas.index == indices.last {
+                    indices.first
+                } else {
+                    atlas.index + 1
+                };
+            }
+        }
     }
 }
 

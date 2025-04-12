@@ -19,3 +19,12 @@ pub struct Size {
     pub width: f32,
     pub height: f32,
 }
+
+#[derive(Component, Deref, DerefMut)]
+pub struct AnimationTimer(pub Timer);
+
+#[derive(Component)]
+pub struct AnimationIndices {
+    pub first: usize,
+    pub last: usize,
+}
